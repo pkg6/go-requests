@@ -308,7 +308,9 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 		}
 	}
 	//重新加载上下文
-	request = request.WithContext(c.withContext(ctx))
+	if withContext := c.withContext(ctx); withContext != nil {
+		request = request.WithContext(withContext)
+	}
 	//加载cookie
 	c.WithCookieString("")
 	// Custom header.
