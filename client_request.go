@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -149,11 +148,13 @@ func (c *Client) DoRequest(ctx context.Context, method, uri string, body any) (r
 		middlewares = append(middlewares, func(cli *Client, r *http.Request) (*Response, error) {
 			return cli.callRequest(r)
 		})
-		ctx = context.WithValue(request.Context(), clientMiddlewareKey, &clientMiddleware{
-			client:       c,
-			handlers:     middlewares,
-			handlerIndex: -1,
-		})
+		ctx = context.WithValue(request.Context(),
+			clientMiddlewareKey,
+			&clientMiddleware{
+				client:       c,
+				handlers:     middlewares,
+				handlerIndex: -1,
+			})
 		request = request.WithContext(ctx)
 		response, err = c.Next(request)
 	} else {
@@ -170,7 +171,7 @@ func (c *Client) callRequest(request *http.Request) (response *Response, err err
 	response = &Response{request: request, client: c}
 	reqBodyContent, err := io.ReadAll(request.Body)
 	if err != nil {
-		c.log.Fatal(fmt.Sprintf(`io.ReadAll: %v`, err))
+		return response, fmt.Errorf(`io.ReadAll: %v`, err)
 	}
 	response.requestBody = reqBodyContent
 	request.Body = NewReadCloser(reqBodyContent, false)
@@ -187,7 +188,7 @@ func (c *Client) callRequest(request *http.Request) (response *Response, err err
 			} else {
 				break
 			}
-			c.log.Fatal(fmt.Sprintf(`client.Do: %v`, err))
+			return response, fmt.Errorf(fmt.Sprintf(`client.Do: %v`, err))
 		} else {
 			break
 		}
@@ -286,12 +287,12 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 			bodyBuffer = bytes.NewBuffer(nil)
 		}
 		if request, err = http.NewRequest(method, uri, bodyBuffer); err != nil {
-			return nil, errors.New(fmt.Sprintf(`http.NewRequest failed with method "%s" and URL "%s"`, method, uri))
+			return nil, fmt.Errorf(`http.NewRequest failed with method "%s" and URL "%s"`, method, uri)
 		}
 	} else {
 		paramBytes := []byte(params)
 		if request, err = http.NewRequest(method, uri, bytes.NewReader(paramBytes)); err != nil {
-			return nil, errors.New(fmt.Sprintf(`http.NewRequest failed for method "%s" and URL "%s"`, method, uri))
+			return nil, fmt.Errorf(`http.NewRequest failed for method "%s" and URL "%s"`, method, uri)
 		} else {
 			if v := c.header.Get(HttpHeaderContentType); v != "" {
 				// Custom Content-Type.
