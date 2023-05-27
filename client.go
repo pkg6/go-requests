@@ -15,17 +15,16 @@ import (
 )
 
 const (
-	httpSchemeName                 = `http`
-	httpParamFileHolder            = `@file:`
-	httpRegexParamJson             = `^[\w\[\]]+=.+`
-	httpHeaderHost                 = `Host`
-	httpHeaderCookie               = `Cookie`
-	HttpHeaderUserAgent            = `User-Agent`
-	HttpHeaderContentType          = `Content-Type`
-	HttpHeaderContentTypePlainText = `text/plain; charset=utf-8`
-	HttpHeaderContentTypeJson      = `application/json`
-	HttpHeaderContentTypeXml       = `application/xml`
-	HttpHeaderContentTypeForm      = `application/x-www-form-urlencoded`
+	httpSchemeName            = `http`
+	httpParamFileHolder       = `@file:`
+	httpRegexParamJson        = `^[\w\[\]]+=.+`
+	httpHeaderHost            = `Host`
+	httpHeaderCookie          = `Cookie`
+	HttpHeaderUserAgent       = `User-Agent`
+	HttpHeaderContentType     = `Content-Type`
+	HttpHeaderContentTypeJson = `application/json`
+	HttpHeaderContentTypeXml  = `application/xml`
+	HttpHeaderContentTypeForm = `application/x-www-form-urlencoded`
 )
 
 var (

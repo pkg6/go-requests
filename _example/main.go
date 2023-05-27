@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/pkg6/go-requests"
 	"net/url"
+
+	"github.com/pkg6/go-requests"
 )
 
 func main() {

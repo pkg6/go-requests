@@ -5,13 +5,14 @@ import (
 	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
-	"golang.org/x/net/proxy"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
 	"time"
+
+	"golang.org/x/net/proxy"
 )
 
 // BrowserMode enables browser mode of the client.
