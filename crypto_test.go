@@ -1,6 +1,9 @@
 package requests
 
-import "testing"
+import (
+	"io"
+	"testing"
+)
 
 func TestBase64Decode(t *testing.T) {
 	type args struct {
@@ -48,6 +51,58 @@ func TestBase64Encode(t *testing.T) {
 	}
 }
 
+func TestBase64File(t *testing.T) {
+	type args struct {
+		path string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Base64File(tt.args.path)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Base64File() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Base64File() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBase64Reader(t *testing.T) {
+	type args struct {
+		reader io.Reader
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Base64Reader(tt.args.reader)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Base64Reader() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Base64Reader() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestMd5(t *testing.T) {
 	type args struct {
 		str string
@@ -89,6 +144,32 @@ func TestMd5File(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("Md5File() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMd5Reader(t *testing.T) {
+	type args struct {
+		reader io.Reader
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Md5Reader(tt.args.reader)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Md5Reader() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Md5Reader() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
