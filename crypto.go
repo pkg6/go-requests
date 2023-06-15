@@ -51,15 +51,35 @@ func Base64Decode(str string) (string, error) {
 	return string(decodeString), nil
 }
 
+func Base64File(path string) (string, error) {
+	f, err := os.Open(path)
+	defer f.Close()
+	if err != nil {
+		return "", errors.New(fmt.Sprintf(`os.Open failed for name "%s"`, path))
+	}
+	return Base64Reader(f)
+}
+
+func Base64Reader(reader io.Reader) (string, error) {
+	fd, err := io.ReadAll(reader)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf(`io.ReadAll failed  "%v"`, err))
+	}
+	return base64.StdEncoding.EncodeToString(fd), nil
+}
+
 func Md5File(path string) (string, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf(`os.Open failed for name "%s"`, path))
 	}
 	defer f.Close()
+	return Md5Reader(f)
+}
+
+func Md5Reader(reader io.Reader) (string, error) {
 	h := md5.New()
-	_, err = io.Copy(h, f)
-	if err != nil {
+	if _, err := io.Copy(h, reader); err != nil {
 		return "", errors.New(`io.Copy failed`)
 	}
 	return fmt.Sprintf("%x", h.Sum(nil)), nil
