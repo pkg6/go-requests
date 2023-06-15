@@ -28,13 +28,12 @@ const (
 )
 
 var (
-	hdrUserAgentKey = http.CanonicalHeaderKey(HttpHeaderUserAgent)
-
+	hdrUserAgentKey    = http.CanonicalHeaderKey(HttpHeaderUserAgent)
 	hostname, _        = os.Hostname()
 	defaultClientAgent = fmt.Sprintf(`pkg6/go-request client at  %s`, hostname)
 	defaultRetryCount  = 3
 	defaultWaitTime    = time.Duration(2000) * time.Millisecond
-	DefaultClient      = new(Client).Clone()
+	DefaultClient      = New()
 )
 
 type (
@@ -71,9 +70,9 @@ type Client struct {
 	attempt                int
 }
 
-// HttpClient
+// defaultHttpClient
 //set InsecureSkipVerify = false c.Client.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify = false
-func HttpClient(localAddr net.Addr) *http.Client {
+func defaultHttpClient(localAddr net.Addr) *http.Client {
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
@@ -99,21 +98,16 @@ func HttpClient(localAddr net.Addr) *http.Client {
 }
 
 func New() *Client {
-	return new(Client).Clone()
+	return NewHttpClient(defaultHttpClient(nil))
 }
 
 func NewHttpClient(client *http.Client) *Client {
-	c := &Client{}
-	c.Client = client
-	return c
+	return new(Client).Clone().WitchHttpClient(client)
 }
 
 // Clone
 //Parameter initialization
 func (c *Client) Clone() *Client {
-	if c.Client == nil {
-		c.Client = HttpClient(nil)
-	}
 	c.debug = false
 	c.header = make(http.Header, 0)
 	c.cookies = make(map[string]string, 0)
@@ -147,6 +141,12 @@ func (c *Client) Clone() *Client {
 	c.attempt = 1
 	return c
 }
+
+func (c *Client) WitchHttpClient(client *http.Client) *Client {
+	c.Client = client
+	return c
+}
+
 func (c *Client) Debug() *Client {
 	c.debug = true
 	return c
