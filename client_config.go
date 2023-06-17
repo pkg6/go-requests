@@ -38,12 +38,7 @@ func (c *Client) WithCookies(cookies map[string]string) *Client {
 }
 func (c *Client) WithCookieString(cookie string) *Client {
 	if cookie == "" {
-		for k, v := range c.cookies {
-			if len(cookie) > 0 {
-				cookie += ";"
-			}
-			cookie += k + "=" + v
-		}
+		cookie = MapCookiesToString(c.cookies, cookie)
 	}
 	if cookie != "" {
 		c.WithHeader(httpHeaderCookie, cookie)

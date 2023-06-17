@@ -68,6 +68,10 @@ func (r *Response) GetCookie(key string) string {
 	return ""
 }
 
+func (r *Response) GetCookieString() string {
+	return MapCookiesToString(r.GetCookieMap(), "")
+}
+
 // ReadAll retrieves and returns the response content as []byte.
 func (r *Response) ReadAll() []byte {
 	// Response might be nil.

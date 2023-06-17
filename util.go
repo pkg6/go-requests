@@ -150,3 +150,13 @@ func HttpBuildQuery(params map[string]any, parentKey string) string {
 	}
 	return strings.Join(queryStr, "&")
 }
+
+func MapCookiesToString(cookies map[string]string, cookieStr string) string {
+	for k, v := range cookies {
+		if len(cookieStr) > 0 {
+			cookieStr += ";"
+		}
+		cookieStr += k + "=" + v
+	}
+	return cookieStr
+}
