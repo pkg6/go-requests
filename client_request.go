@@ -160,6 +160,10 @@ func (c *Client) DoRequest(ctx context.Context, method, uri string, body any) (r
 	} else {
 		response, err = c.callRequest(request)
 	}
+	if err != nil {
+		c.doErrorHooks(request, response, err)
+		return nil, err
+	}
 	if err = c.doResponseCallbacks(request, response); err != nil {
 		c.doErrorHooks(request, response, err)
 		return nil, err
