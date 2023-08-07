@@ -2,6 +2,7 @@ package requests
 
 import (
 	"io"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -129,20 +130,24 @@ func TestMd5File(t *testing.T) {
 		path string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
+		name string
+		path string
+		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "test1",
+			path: "./_example/github.png",
+			want: "404a5db8eec868e5f29b9d20b0395094",
+		},
+		{
+			name: "test2",
+			path: "./_example/github.png",
+			want: "404a5db8eec868e5f29b9d20b0395094",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Md5File(tt.args.path)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Md5File() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got, _ := Md5File(tt.path)
 			if got != tt.want {
 				t.Errorf("Md5File() got = %v, want %v", got, tt.want)
 			}
@@ -151,24 +156,27 @@ func TestMd5File(t *testing.T) {
 }
 
 func TestMd5Reader(t *testing.T) {
-	type args struct {
-		reader io.Reader
-	}
+	f, _ := os.Open("./_example/github.png")
 	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
+		name string
+		file *os.File
+		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "test1",
+			file: f,
+			want: "404a5db8eec868e5f29b9d20b0395094",
+		},
+		{
+			name: "test2",
+			file: f,
+			want: "404a5db8eec868e5f29b9d20b0395094",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Md5Reader(tt.args.reader)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Md5Reader() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			tt.file.Seek(0, 0)
+			got, _ := Md5Reader(tt.file)
 			if got != tt.want {
 				t.Errorf("Md5Reader() got = %v, want %v", got, tt.want)
 			}
