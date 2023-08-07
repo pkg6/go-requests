@@ -164,6 +164,14 @@ func PostForm(uri string, data url.Values, args ...ArgsFunc) (*Response, error) 
 	return client.PostForm(context.Background(), uri, data)
 }
 
+func PostFormWithFiles(uri string, data url.Values, args ...ArgsFunc) (*Response, error) {
+	client := new(Client).Clone().WitchHttpClient(defaultHttpClient(nil))
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.PostFormWithFiles(context.Background(), uri, data)
+}
+
 func Request(method, uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone().WitchHttpClient(defaultHttpClient(nil))
 	for _, arg := range args {
