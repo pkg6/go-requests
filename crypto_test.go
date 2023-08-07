@@ -2,6 +2,7 @@ package requests
 
 import (
 	"io"
+	"reflect"
 	"testing"
 )
 
@@ -256,6 +257,26 @@ func TestURLEncode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := URLEncode(tt.args.str); got != tt.want {
 				t.Errorf("URLEncode() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBase64StdEncoding(t *testing.T) {
+	type args struct {
+		base64Str string
+	}
+	tests := []struct {
+		name string
+		args args
+		want io.Reader
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Base64StdEncoding(tt.args.base64Str); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Base64StdEncoding() = %v, want %v", got, tt.want)
 			}
 		})
 	}
