@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"strings"
 )
 
 func Md5(str string) string {
@@ -60,6 +61,10 @@ func Base64File(path string) (string, error) {
 	return Base64Reader(f)
 }
 
+func Base64StdEncoding(base64Str string) io.Reader {
+	return base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64Str))
+}
+
 func Base64Reader(reader io.Reader) (string, error) {
 	fd, err := io.ReadAll(reader)
 	if err != nil {
@@ -77,6 +82,10 @@ func Md5File(path string) (string, error) {
 	return Md5Reader(f)
 }
 
+// Md5Reader
+//f, _ := os.Open("./_example/1.jpeg")
+//f.Seek(0, 0)
+//requests.Md5Reader(f)
 func Md5Reader(reader io.Reader) (string, error) {
 	h := md5.New()
 	if _, err := io.Copy(h, reader); err != nil {
