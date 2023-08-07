@@ -93,6 +93,37 @@ func (c *Client) PostForm(ctx context.Context, uri string, data url.Values) (*Re
 	w := multipart.NewWriter(body)
 	for k := range data {
 		v := data.Get(k)
+		if err := w.WriteField(k, v); err != nil {
+			return nil, err
+		}
+	}
+	if err := w.Close(); err != nil {
+		return nil, err
+	}
+	return c.WithContentType(w.FormDataContentType()).Post(ctx, uri, body)
+}
+
+// PostFormWithFiles is different from net/http.PostForm.
+// It's a wrapper of Post method, which sets the Content-Type as "multipart/form-data;".
+// and It will automatically set boundary characters for the request body and Content-Type.
+//
+// It's Seem like the following case:
+//
+// Content-Type: multipart/form-data; boundary=----Boundarye4Ghaog6giyQ9ncN
+//
+// And form data is like:
+// ------Boundarye4Ghaog6giyQ9ncN
+// Content-Disposition: form-data; name="checkType"
+//
+// none
+//
+// It's used for sending form data.
+// Note that the response object MUST be closed if it'll never be used.
+func (c *Client) PostFormWithFiles(ctx context.Context, uri string, data url.Values) (*Response, error) {
+	body := new(bytes.Buffer)
+	w := multipart.NewWriter(body)
+	for k := range data {
+		v := data.Get(k)
 		if strings.Contains(v, httpParamFileHolder) {
 			localPathFile := strings.ReplaceAll(strings.ReplaceAll(v, httpParamFileHolder, ""), " ", "")
 			osfile, err := os.Open(localPathFile)
