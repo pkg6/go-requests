@@ -82,6 +82,10 @@ func Md5File(path string) (string, error) {
 	return Md5Reader(f)
 }
 
+// Md5Reader
+//f, _ := os.Open("./_example/1.jpeg")
+//f.Seek(0, 0)
+//requests.Md5Reader(f)
 func Md5Reader(reader io.Reader) (string, error) {
 	h := md5.New()
 	if _, err := io.Copy(h, reader); err != nil {
