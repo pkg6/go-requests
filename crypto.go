@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"strings"
 )
 
 func Md5(str string) string {
@@ -58,6 +59,10 @@ func Base64File(path string) (string, error) {
 		return "", errors.New(fmt.Sprintf(`os.Open failed for name "%s"`, path))
 	}
 	return Base64Reader(f)
+}
+
+func Base64StdEncoding(base64Str string) io.Reader {
+	return base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64Str))
 }
 
 func Base64Reader(reader io.Reader) (string, error) {
