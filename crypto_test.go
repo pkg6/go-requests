@@ -136,12 +136,12 @@ func TestMd5File(t *testing.T) {
 	}{
 		{
 			name: "test1",
-			path: "./_example/github.png",
+			path: "./tests/github.png",
 			want: "404a5db8eec868e5f29b9d20b0395094",
 		},
 		{
 			name: "test2",
-			path: "./_example/github.png",
+			path: "./tests/github.png",
 			want: "404a5db8eec868e5f29b9d20b0395094",
 		},
 	}
@@ -156,7 +156,7 @@ func TestMd5File(t *testing.T) {
 }
 
 func TestMd5Reader(t *testing.T) {
-	f, _ := os.Open("./_example/github.png")
+	f, _ := os.Open("./tests/github.png")
 	tests := []struct {
 		name string
 		file *os.File
