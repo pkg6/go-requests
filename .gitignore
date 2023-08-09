@@ -1,5 +1,4 @@
-/.idea
-/_example
+.idea
 # Binaries for programs and plugins
 *.exe
 *.exe~
