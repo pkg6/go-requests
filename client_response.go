@@ -88,7 +88,7 @@ func (r *Response) ReadAll() []byte {
 }
 
 // ReadStreamArgs
-//openai chatgpt: readStreamArgs := ReadStreamArgs{
+//openai chatgpt: requests.ReadStreamArgs{
 //		DataPrefix:  []byte("data: "),
 //		ErrorPrefix: []byte(`data: {"error":`),
 //		EndPrefix:   []byte("[DONE]"),
@@ -107,13 +107,19 @@ func (r *Response) ReadStream(readStreamArgs ReadStreamArgs) uint {
 	var (
 		emptyMessagesCount uint
 		hasErrorPrefix     bool
+		emptyArgs          bool
 	)
-	if r.IsError() {
+	if readStreamArgs.DataPrefix == nil ||
+		readStreamArgs.ErrorPrefix == nil ||
+		readStreamArgs.EndPrefix == nil ||
+		readStreamArgs.Callback == nil {
+		emptyArgs = true
+	}
+	if emptyArgs || r.IsError() {
 		return emptyMessagesCount
 	}
 	for {
-		bufio := bufio.NewReader(r.Response.Body)
-		rawLine, err := bufio.ReadBytes('\n')
+		rawLine, err := bufio.NewReader(r.Response.Body).ReadBytes('\n')
 		if err != nil {
 			break
 		}
