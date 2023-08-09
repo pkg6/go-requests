@@ -52,6 +52,50 @@ request := requests.New()
 request.PostFormWithFiles(context.Background(), "http://127.0.0.1/upload", u)
 ~~~
 
+## stream请求与返回处理
+
+[chatgpt【以微软为例】](https://learn.microsoft.com/zh-cn/azure/ai-services/openai/how-to/function-calling)
+
+~~~
+package main
+
+import (
+	"fmt"
+	"github.com/pkg6/go-requests"
+)
+
+func main() {
+	payload := map[string]interface{}{
+		"messages": []map[string]string{
+			{
+				"role":    "user",
+				"content": "你好",
+			},
+		},
+		"stream":            true,
+		"max_tokens":        800,
+		"temperature":       0.7,
+		"frequency_penalty": 0,
+		"presence_penalty":  0,
+		"top_p":             0.95,
+		"stop":              nil,
+	}
+	json, _ := requests.PostJson("end-point url", payload, func(client *requests.Client) {
+		client.WithHeader("api-key", "api-key")
+		client.AsStream()
+	})
+	defer json.Close()
+	json.ReadStream(requests.ReadStreamArgs{
+		DataPrefix:  []byte("data: "),
+		ErrorPrefix: []byte(`data: {"error":`),
+		EndPrefix:   []byte("[DONE]"),
+		Callback: func(line []byte) {
+			fmt.Println(string(line))
+		},
+	})
+}
+~~~
+
 ## 返回对象
 
 ~~~
@@ -71,6 +115,6 @@ request.PostFormWithFiles(context.Background(), "http://127.0.0.1/upload", u)
 
 如果你认可我们的开源项目，有兴趣为 go-sms的发展做贡献，竭诚欢迎加入我们一起开发完善。无论是[报告错误](https://github.com/pkg6/go-requests/issues)或是 [Pull Request](https://github.com/pkg6/go-requests/pulls) 开发，那怕是修改一个错别字也是对我们莫大的帮助。
 
-### License
+## License
 
 go-requests is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) License - see the [LICENSE](https://github.com/pkg6/go-requests/blob/main/LICENSE) file for details
