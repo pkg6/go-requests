@@ -1,6 +1,8 @@
 package requests
 
 import (
+	"bufio"
+	"bytes"
 	"io"
 	"net/http"
 )
@@ -83,6 +85,56 @@ func (r *Response) ReadAll() []byte {
 		return nil
 	}
 	return body
+}
+
+// ReadStreamArgs
+//openai chatgpt: readStreamArgs := ReadStreamArgs{
+//		DataPrefix:  []byte("data: "),
+//		ErrorPrefix: []byte(`data: {"error":`),
+//		EndPrefix:   []byte("[DONE]"),
+//		Callback: func(line []byte) {
+//			fmt.Println(string(line))
+//		},
+//	}
+type ReadStreamArgs struct {
+	DataPrefix  []byte
+	ErrorPrefix []byte
+	EndPrefix   []byte
+	Callback    func(line []byte)
+}
+
+func (r *Response) ReadStream(readStreamArgs ReadStreamArgs) uint {
+	var (
+		emptyMessagesCount uint
+		hasErrorPrefix     bool
+	)
+	if r.IsError() {
+		return emptyMessagesCount
+	}
+	for {
+		bufio := bufio.NewReader(r.Response.Body)
+		rawLine, err := bufio.ReadBytes('\n')
+		if err != nil {
+			break
+		}
+		spaceLine := bytes.TrimSpace(rawLine)
+		if bytes.HasPrefix(spaceLine, readStreamArgs.ErrorPrefix) {
+			hasErrorPrefix = true
+		}
+		if !bytes.HasPrefix(spaceLine, readStreamArgs.DataPrefix) || hasErrorPrefix {
+			if hasErrorPrefix {
+				spaceLine = bytes.TrimPrefix(spaceLine, readStreamArgs.DataPrefix)
+			}
+			emptyMessagesCount++
+			continue
+		}
+		noPrefixLine := bytes.TrimPrefix(spaceLine, readStreamArgs.DataPrefix)
+		if string(noPrefixLine) == string(readStreamArgs.EndPrefix) {
+			break
+		}
+		readStreamArgs.Callback(noPrefixLine)
+	}
+	return emptyMessagesCount
 }
 
 // ReadAllString retrieves and returns the response content as string.
