@@ -102,18 +102,6 @@ func ToString(any any) string {
 	}
 }
 
-func Uri(uri string, query ...url.Values) *url.URL {
-	u, _ := url.Parse(uri)
-	q := u.Query()
-	for _, value := range query {
-		for k, val := range value {
-			q.Set(k, val[0])
-		}
-	}
-	u.RawQuery = q.Encode()
-	return u
-}
-
 func IsMatchString(expr string, s string) bool {
 	return regexp.MustCompile(expr).MatchString(s)
 }
@@ -129,6 +117,28 @@ func IsXMLType(s string) bool {
 }
 func functionName(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+}
+
+func Uri(uri string, query ...url.Values) *url.URL {
+	u, _ := url.Parse(uri)
+	q := u.Query()
+	for _, value := range query {
+		for k, _ := range value {
+			q.Set(k, value.Get(k))
+		}
+	}
+	u.RawQuery = q.Encode()
+	return u
+}
+
+func UrlValues(uvs ...url.Values) url.Values {
+	query := url.Values{}
+	for _, value := range uvs {
+		for k, _ := range value {
+			query.Set(k, value.Get(k))
+		}
+	}
+	return query
 }
 
 // HttpBuildQuery Generate get request parameters

@@ -251,23 +251,26 @@ func (c *Client) WithRedirectLimit(redirectLimit int) *Client {
 func (c *Client) WithRedirectPolicy(policies ...any) *Client {
 	if len(policies) == 1 {
 		if checkRedirect, ok := policies[0].(func(req *http.Request, via []*http.Request) error); ok {
-			c.CheckRedirect = checkRedirect
+			c.WithCheckRedirect(checkRedirect)
 			return c
 		}
 	}
-	for _, p := range policies {
-		if _, ok := p.(RedirectPolicy); !ok {
-			c.log.Fatalf("%v does not implement resty.RedirectPolicy (missing Apply method)", functionName(p))
-		}
-	}
-	c.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+	c.WithCheckRedirect(func(req *http.Request, via []*http.Request) error {
 		for _, p := range policies {
-			if err := p.(RedirectPolicy).Apply(req, via); err != nil {
-				return err
+			if _, ok := p.(RedirectPolicy); ok {
+				if err := p.(RedirectPolicy).Apply(req, via); err != nil {
+					return err
+				}
+			} else {
+				c.log.Fatalf("%v does not implement resty.RedirectPolicy (missing Apply method)", functionName(p))
 			}
 		}
 		// looks good, go ahead
 		return nil
-	}
+	})
 	return c
+}
+
+func (c *Client) WithCheckRedirect(fn func(req *http.Request, via []*http.Request) error) {
+	c.CheckRedirect = fn
 }
