@@ -54,7 +54,7 @@ request.PostFormWithFiles(context.Background(), "http://127.0.0.1/upload", u)
 
 ## stream请求与返回处理
 
-[chatgpt【以微软为例】](https://learn.microsoft.com/zh-cn/azure/ai-services/openai/how-to/function-calling)
+[ChatGPT【以微软为例】](https://learn.microsoft.com/zh-cn/azure/ai-services/openai/how-to/function-calling)
 
 ~~~
 package main
@@ -113,8 +113,9 @@ func main() {
 
 ## 加入我们
 
-如果你认可我们的开源项目，有兴趣为 go-sms的发展做贡献，竭诚欢迎加入我们一起开发完善。无论是[报告错误](https://github.com/pkg6/go-requests/issues)或是 [Pull Request](https://github.com/pkg6/go-requests/pulls) 开发，那怕是修改一个错别字也是对我们莫大的帮助。
+如果你认可我们的开源项目，有兴趣为 [go-requests](https://github.com/pkg6/go-requests) 的发展做贡献，竭诚欢迎加入我们一起开发完善。无论是[报告错误](https://github.com/pkg6/go-requests/issues)或是 [Pull Request](https://github.com/pkg6/go-requests/pulls) 开发，那怕是修改一个错别字也是对我们莫大的帮助。
 
 ## License
 
 go-requests is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) License - see the [LICENSE](https://github.com/pkg6/go-requests/blob/main/LICENSE) file for details
+
