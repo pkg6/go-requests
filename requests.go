@@ -12,7 +12,7 @@ type ArgsFunc func(client *Client)
 
 func Debug() ArgsFunc {
 	return func(client *Client) {
-		client.EnableDebug()
+		client.Debug = true
 	}
 }
 func WithCookie(k, v string) ArgsFunc {

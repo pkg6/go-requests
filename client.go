@@ -48,12 +48,11 @@ type (
 type Client struct {
 	*http.Client
 	BaseUrl                string
-	Query                  url.Values
-	prefix                 string // Deprecated: use prefix instead. To be removed in v0.1.x release.
 	Debug                  bool
+	Query                  url.Values
+	Logger                 *log.Logger
 	header                 http.Header
 	cookies                map[string]string
-	log                    *log.Logger
 	jsonMarshal            func(v any) ([]byte, error)
 	jsonUnmarshal          func(data []byte, v any) error
 	xmlMarshal             func(v any) ([]byte, error)
@@ -112,6 +111,8 @@ func NewHttpClient(client *http.Client) *Client {
 //Parameter initialization
 func (c *Client) Clone() *Client {
 	c.Debug = false
+	c.Query = nil
+	c.BaseUrl = ""
 	c.header = make(http.Header, 0)
 	c.cookies = make(map[string]string, 0)
 	c.retryWaitTime = defaultWaitTime
@@ -130,8 +131,8 @@ func (c *Client) Clone() *Client {
 	if c.xmlUnmarshal == nil {
 		c.SetXMLUnmarshaler(xml.Unmarshal)
 	}
-	if c.log == nil {
-		c.log = log.Default()
+	if c.Logger == nil {
+		c.Logger = log.Default()
 	}
 	if c.header.Get(HttpHeaderUserAgent) == "" {
 		c.WithUserAgent(defaultClientAgent)
@@ -147,26 +148,18 @@ func (c *Client) WitchHttpClient(client *http.Client) *Client {
 	return c
 }
 
-func (c *Client) EnableDebug() *Client {
-	c.Debug = true
-	return c
-}
-
 func (c *Client) SetBaseURL(baseUrl string) *Client {
 	c.BaseUrl = baseUrl
 	return c
 }
 
-// SetPrefix sets the request server URL prefix.
-// Deprecated: use SetBaseURL instead. To be removed in v0.1.x release.
-func (c *Client) SetPrefix(prefix string) *Client {
-	c.prefix = prefix
-	c.SetBaseURL(prefix)
+func (c *Client) SetQuery(query url.Values) *Client {
+	c.Query = query
 	return c
 }
 
-func (c *Client) SetQuery(query url.Values) *Client {
-	c.Query = query
+func (c *Client) SetDebug(debug bool) *Client {
+	c.Debug = debug
 	return c
 }
 
