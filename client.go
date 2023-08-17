@@ -46,10 +46,16 @@ type (
 
 type Client struct {
 	*http.Client
-	debug                  bool
+	BaseUrl                string
+	Debug                  bool
 	header                 http.Header
 	cookies                map[string]string
-	prefix                 string
+	prefix                 string // Deprecated: use prefix instead. To be removed in v0.1.x release.
+	log                    *log.Logger
+	jsonMarshal            func(v any) ([]byte, error)
+	jsonUnmarshal          func(data []byte, v any) error
+	xmlMarshal             func(v any) ([]byte, error)
+	xmlUnmarshal           func(data []byte, v any) error
 	middlewares            []MiddlewareFunc
 	beforeRequestCallbacks []clientCallback
 	afterRequestCallbacks  []requestCallback
@@ -59,11 +65,6 @@ type Client struct {
 	panicHooks             []ErrorHook
 	retryCount             int
 	retryWaitTime          time.Duration
-	log                    *log.Logger
-	jsonMarshal            func(v any) ([]byte, error)
-	jsonUnmarshal          func(data []byte, v any) error
-	xmlMarshal             func(v any) ([]byte, error)
-	xmlUnmarshal           func(data []byte, v any) error
 	lock                   sync.RWMutex
 	traceContext           traceContext
 	trace                  bool
@@ -108,7 +109,7 @@ func NewHttpClient(client *http.Client) *Client {
 // Clone
 //Parameter initialization
 func (c *Client) Clone() *Client {
-	c.debug = false
+	c.Debug = false
 	c.header = make(http.Header, 0)
 	c.cookies = make(map[string]string, 0)
 	c.retryWaitTime = defaultWaitTime
@@ -147,14 +148,21 @@ func (c *Client) WitchHttpClient(client *http.Client) *Client {
 	return c
 }
 
-func (c *Client) Debug() *Client {
-	c.debug = true
+func (c *Client) EnableDebug() *Client {
+	c.Debug = true
+	return c
+}
+
+func (c *Client) SetBaseURL(baseUrl string) *Client {
+	c.BaseUrl = baseUrl
 	return c
 }
 
 // SetPrefix sets the request server URL prefix.
+// Deprecated: use SetBaseURL instead. To be removed in v0.1.x release.
 func (c *Client) SetPrefix(prefix string) *Client {
 	c.prefix = prefix
+	c.SetBaseURL(prefix)
 	return c
 }
 

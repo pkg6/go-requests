@@ -231,21 +231,6 @@ func (c *Client) callRequest(request *http.Request) (response *Response, err err
 	return response, err
 }
 func (c *Client) prepareBodyDefault(method string, body any) string {
-	if str, ok := body.(string); ok {
-		return str
-	}
-	if bodyByte, ok := body.([]byte); ok {
-		return string(bodyByte)
-	}
-	if uri, ok := body.(url.Values); ok {
-		return uri.Encode()
-	}
-	if uri, ok := body.(*url.Values); ok {
-		return uri.Encode()
-	}
-	if bb, ok := body.(*bytes.Buffer); ok {
-		return bb.String()
-	}
 	if method == http.MethodGet && body != nil {
 		if mapAny, ok := body.(map[string]any); ok {
 			return HttpBuildQuery(mapAny, "")
@@ -257,7 +242,22 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 			}
 		}
 	}
-	return ToString(body)
+	switch v := body.(type) {
+	case url.Values:
+		return v.Encode()
+	case *url.Values:
+		return v.Encode()
+	case *bytes.Buffer:
+		return v.String()
+	case bytes.Buffer:
+		return v.String()
+	case strings.Builder:
+		return v.String()
+	case *strings.Builder:
+		return v.String()
+	default:
+		return ToString(v)
+	}
 }
 func (c *Client) prepareBody(method string, body any) (string, error) {
 	var params string
@@ -294,8 +294,9 @@ func (c *Client) prepareBody(method string, body any) (string, error) {
 
 func (c *Client) prepareRequest(ctx context.Context, method, uri string, body any) (request *http.Request, err error) {
 	method = strings.ToUpper(method)
-	if len(c.prefix) > 0 {
-		uri = c.prefix + strings.Trim(uri, "")
+
+	if len(c.BaseUrl) > 0 {
+		uri = c.BaseUrl + strings.Trim(uri, "")
 	}
 	if !strings.Contains(uri, httpSchemeName) {
 		uri = httpSchemeName + "://" + uri

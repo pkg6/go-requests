@@ -8,7 +8,7 @@ import (
 )
 
 func requestLogger(client *Client, request *http.Request) error {
-	if client.debug {
+	if client.Debug {
 		reqLog := "\n==============================================================================\n" +
 			"~~~ REQUEST ~~~\n" +
 			fmt.Sprintf("%s  %s  %s\n", request.Method, request.URL.RequestURI(), request.Proto) +
@@ -22,7 +22,7 @@ func requestLogger(client *Client, request *http.Request) error {
 	return nil
 }
 func responseLogger(client *Client, request *http.Request, response *Response) error {
-	if client.debug {
+	if client.Debug {
 		var reqBodyContent []byte
 		if response.Body != nil {
 			reqBodyContent, _ = io.ReadAll(response.Body)
@@ -35,8 +35,8 @@ func responseLogger(client *Client, request *http.Request, response *Response) e
 			fmt.Sprintf("ATTEMPT      : %v\n", client.attempt) +
 			fmt.Sprintf("RECEIVED AT  : %v\n", time.Now().Format(time.RFC3339Nano)) +
 			fmt.Sprintf("TIME DURATION: %v\n", time.Now()) +
-			fmt.Sprintf("HEADERS: %v\n", response.Header) +
-			fmt.Sprintf("BODY: %s\n", string(reqBodyContent))
+			fmt.Sprintf("HEADERS: %v\n", response.Header)
+		debugLog += fmt.Sprintf("BODY: %s\n", string(reqBodyContent))
 		debugLog += "==============================================================================\n"
 		client.log.Println(debugLog)
 	}
