@@ -164,7 +164,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 	}
 	_proxy, err := url.Parse(proxyURL)
 	if err != nil {
-		c.log.Fatalf(`%+v`, err)
+		c.Logger.Fatalf(`%+v`, err)
 		return c
 	}
 	if _proxy.Scheme == httpSchemeName {
@@ -194,7 +194,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 			},
 		)
 		if err != nil {
-			c.log.Fatalf(`%+v`, err)
+			c.Logger.Fatalf(`%+v`, err)
 			return c
 		}
 		if v, ok := c.Transport.(*http.Transport); ok {
@@ -210,7 +210,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) *Client {
 	crt, err := tls.LoadX509KeyPair(crtFile, keyFile)
 	if err != nil {
-		c.log.Fatalf("LoadKeyCrt failed")
+		c.Logger.Fatalf("LoadKeyCrt failed")
 		return c
 	}
 	tlsConfig := &tls.Config{}
@@ -226,7 +226,7 @@ func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) *Client {
 func (c *Client) SetTLSConfig(tlsConfig *tls.Config) *Client {
 	v, ok := c.Transport.(*http.Transport)
 	if !ok {
-		c.log.Fatalf(`cannot set TLSClientConfig for custom Transport of the client`)
+		c.Logger.Fatalf(`cannot set TLSClientConfig for custom Transport of the client`)
 	}
 	v.TLSClientConfig = tlsConfig
 	return c
@@ -262,7 +262,7 @@ func (c *Client) WithRedirectPolicy(policies ...any) *Client {
 					return err
 				}
 			} else {
-				c.log.Fatalf("%v does not implement resty.RedirectPolicy (missing Apply method)", functionName(p))
+				c.Logger.Fatalf("%v does not implement resty.RedirectPolicy (missing Apply method)", functionName(p))
 			}
 		}
 		// looks good, go ahead
