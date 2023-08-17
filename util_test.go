@@ -147,7 +147,7 @@ func TestHttpBuildQuery(t *testing.T) {
 		{map[string]any{"a": "1"}, "a=1"},
 		{map[string]any{"a": "1", "b": "2"}, "a=1&b=2"},
 	} {
-		result := HttpBuildQuery(test.input, "")
+		result := HttpBuildQuery(test.input)
 		if result != test.expect {
 			t.Errorf("failed on %q: want %v, got %v", test.input, test.expect, result)
 		}

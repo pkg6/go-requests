@@ -1,6 +1,7 @@
 package requests
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -8,7 +9,6 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -142,23 +142,32 @@ func UrlValues(uvs ...url.Values) url.Values {
 }
 
 // HttpBuildQuery Generate get request parameters
-func HttpBuildQuery(params map[string]any, parentKey string) string {
-	queryStr := make([]string, 0)
-	for k, v := range params {
-		if val, ok := v.(map[string]any); ok {
-			if parentKey != "" {
-				k = fmt.Sprintf("%s[%s]", parentKey, k)
-			}
-			queryStr = append(queryStr, HttpBuildQuery(val, k))
-		} else {
-			if parentKey != "" {
-				queryStr = append(queryStr, fmt.Sprintf("%s[%s]=%s", parentKey, k, ToString(v)))
-			} else {
-				queryStr = append(queryStr, fmt.Sprintf("%s=%s", k, ToString(v)))
-			}
-		}
+func HttpBuildQuery(data map[string]any) string {
+	var buf bytes.Buffer
+	for k, v := range data {
+		buildQuery(&buf, k, v)
 	}
-	return strings.Join(queryStr, "&")
+	return buf.String()
+}
+
+func buildQuery(buf *bytes.Buffer, key string, val any) {
+	if buf.Len() > 0 {
+		buf.WriteByte('&')
+	}
+	buf.WriteString(url.QueryEscape(key))
+	buf.WriteByte('=')
+	switch v := val.(type) {
+	case map[string]any:
+		for sk, sv := range v {
+			buildQuery(buf, fmt.Sprintf("%s[%s]", key, sk), sv)
+		}
+	case []any:
+		for _, item := range v {
+			buildQuery(buf, key, item)
+		}
+	default:
+		buf.WriteString(url.QueryEscape(fmt.Sprint(v)))
+	}
 }
 
 func MapCookiesToString(cookies map[string]string, cookieStr string) string {
