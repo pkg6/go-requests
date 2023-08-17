@@ -88,7 +88,7 @@ func (r *Response) ReadAll() []byte {
 }
 
 // ReadStreamArgs
-//openai chatgpt: requests.ReadStreamArgs{
+//openai ChatGPT: requests.ReadStreamArgs{
 //		DataPrefix:  []byte("data: "),
 //		ErrorPrefix: []byte(`data: {"error":`),
 //		EndPrefix:   []byte("[DONE]"),
