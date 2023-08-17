@@ -300,12 +300,14 @@ func (c *Client) prepareBody(method string, body any) (string, error) {
 
 func (c *Client) prepareRequest(ctx context.Context, method, uri string, body any) (request *http.Request, err error) {
 	method = strings.ToUpper(method)
-
 	if len(c.BaseUrl) > 0 {
 		uri = c.BaseUrl + strings.Trim(uri, "")
 	}
 	if !strings.Contains(uri, httpSchemeName) {
 		uri = httpSchemeName + "://" + uri
+	}
+	if c.Query != nil {
+		uri = Uri(uri, c.Query).String()
 	}
 	params, err := c.prepareBody(method, body)
 	if err != nil {
