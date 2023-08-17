@@ -2,9 +2,9 @@ package requests
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/pkg6/go-requests/jsons"
 	"log"
 	"net"
 	"net/http"
@@ -121,12 +121,9 @@ func (c *Client) Clone() *Client {
 	c.responseCallbacks = make([]responseCallback, 0)
 	c.successHooks = make([]SuccessHook, 0)
 	c.errorHooks = make([]ErrorHook, 0)
-	if c.jsonMarshal == nil {
-		c.SetJSONMarshaler(json.Marshal)
-	}
-	if c.jsonUnmarshal == nil {
-		c.SetJSONUnmarshaler(json.Unmarshal)
-	}
+	//refer to https://github.com/gin-gonic/gin/tree/master/internal/json
+	c.jsonMarshal = jsons.Marshal
+	c.jsonUnmarshal = jsons.Unmarshal
 	if c.xmlMarshal == nil {
 		c.SetXMLMarshaler(xml.Marshal)
 	}
@@ -170,20 +167,6 @@ func (c *Client) SetPrefix(prefix string) *Client {
 
 func (c *Client) SetQuery(query url.Values) *Client {
 	c.Query = query
-	return c
-}
-
-// SetJSONMarshaler method sets the JSON marshaler function to marshal the request body.
-// By default, Resty uses `encoding/json` package to marshal the request body.
-func (c *Client) SetJSONMarshaler(marshaler func(v any) ([]byte, error)) *Client {
-	c.jsonMarshal = marshaler
-	return c
-}
-
-// SetJSONUnmarshaler method sets the JSON unmarshaler function to unmarshal the response body.
-// By default, Resty uses `encoding/json` package to unmarshal the response body.
-func (c *Client) SetJSONUnmarshaler(unmarshaler func(data []byte, v any) error) *Client {
-	c.jsonUnmarshal = unmarshaler
 	return c
 }
 
