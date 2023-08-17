@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
 	"sync"
@@ -47,10 +48,11 @@ type (
 type Client struct {
 	*http.Client
 	BaseUrl                string
+	Query                  url.Values
+	prefix                 string // Deprecated: use prefix instead. To be removed in v0.1.x release.
 	Debug                  bool
 	header                 http.Header
 	cookies                map[string]string
-	prefix                 string // Deprecated: use prefix instead. To be removed in v0.1.x release.
 	log                    *log.Logger
 	jsonMarshal            func(v any) ([]byte, error)
 	jsonUnmarshal          func(data []byte, v any) error
@@ -163,6 +165,11 @@ func (c *Client) SetBaseURL(baseUrl string) *Client {
 func (c *Client) SetPrefix(prefix string) *Client {
 	c.prefix = prefix
 	c.SetBaseURL(prefix)
+	return c
+}
+
+func (c *Client) SetQuery(query url.Values) *Client {
+	c.Query = query
 	return c
 }
 
