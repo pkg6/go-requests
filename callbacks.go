@@ -2,6 +2,7 @@ package requests
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 )
@@ -22,6 +23,12 @@ func requestLogger(client *Client, request *http.Request) error {
 }
 func responseLogger(client *Client, request *http.Request, response *Response) error {
 	if client.debug {
+		var reqBodyContent []byte
+		if response.Body != nil {
+			reqBodyContent, _ = io.ReadAll(response.Body)
+			response.requestBody = reqBodyContent
+			response.Body = NewReadCloser(reqBodyContent, false)
+		}
 		debugLog := "~~~ RESPONSE ~~~\n" +
 			fmt.Sprintf("STATUS       : %s\n", response.Status) +
 			fmt.Sprintf("PROTO        : %s\n", response.Proto) +
@@ -29,7 +36,7 @@ func responseLogger(client *Client, request *http.Request, response *Response) e
 			fmt.Sprintf("RECEIVED AT  : %v\n", time.Now().Format(time.RFC3339Nano)) +
 			fmt.Sprintf("TIME DURATION: %v\n", time.Now()) +
 			fmt.Sprintf("HEADERS: %v\n", response.Header) +
-			fmt.Sprintf("BODY: %v\n", response.ReadAllString())
+			fmt.Sprintf("BODY: %s\n", string(reqBodyContent))
 		debugLog += "==============================================================================\n"
 		client.log.Println(debugLog)
 	}
