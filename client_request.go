@@ -253,13 +253,13 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 		}
 		return uv.Encode()
 	case map[string]any:
-		return HttpBuildQuery(val, "")
+		return HttpBuildQuery(val)
 	}
 	if method == http.MethodGet && body != nil {
 		if jsonByte, err := c.jsonMarshal(body); err == nil {
 			mapAny := make(map[string]any)
 			if err = c.jsonUnmarshal(jsonByte, &mapAny); err == nil {
-				return HttpBuildQuery(mapAny, "")
+				return HttpBuildQuery(mapAny)
 			}
 		}
 	}
