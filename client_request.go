@@ -231,10 +231,31 @@ func (c *Client) callRequest(request *http.Request) (response *Response, err err
 	return response, err
 }
 func (c *Client) prepareBodyDefault(method string, body any) string {
-	if method == http.MethodGet && body != nil {
-		if mapAny, ok := body.(map[string]any); ok {
-			return HttpBuildQuery(mapAny, "")
+	switch val := body.(type) {
+	case []byte:
+		return string(val)
+	case string:
+		return val
+	case url.Values:
+		return val.Encode()
+	case *url.Values:
+		return val.Encode()
+	case bytes.Buffer:
+		return val.String()
+	case *bytes.Buffer:
+		return val.String()
+	case strings.Builder:
+		return val.String()
+	case map[string]string:
+		uv := url.Values{}
+		for s, s2 := range val {
+			uv.Set(s, s2)
 		}
+		return uv.Encode()
+	case map[string]any:
+		return HttpBuildQuery(val, "")
+	}
+	if method == http.MethodGet && body != nil {
 		if jsonByte, err := c.jsonMarshal(body); err == nil {
 			mapAny := make(map[string]any)
 			if err = c.jsonUnmarshal(jsonByte, &mapAny); err == nil {
@@ -242,22 +263,7 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 			}
 		}
 	}
-	switch v := body.(type) {
-	case url.Values:
-		return v.Encode()
-	case *url.Values:
-		return v.Encode()
-	case *bytes.Buffer:
-		return v.String()
-	case bytes.Buffer:
-		return v.String()
-	case strings.Builder:
-		return v.String()
-	case *strings.Builder:
-		return v.String()
-	default:
-		return ToString(v)
-	}
+	return ToString(body)
 }
 func (c *Client) prepareBody(method string, body any) (string, error) {
 	var params string
