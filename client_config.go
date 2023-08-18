@@ -41,7 +41,7 @@ func (c *Client) WithCookieString(cookie string) *Client {
 		cookie = MapCookiesToString(c.cookies, cookie)
 	}
 	if cookie != "" {
-		c.WithHeader(httpHeaderCookie, cookie)
+		c.WithHeader(HttpHeaderCookie, cookie)
 	}
 	return c
 }
@@ -104,9 +104,9 @@ func (c *Client) AsForm() *Client {
 // AsStream is a Stream
 func (c *Client) AsStream() *Client {
 	c.WithHeaders(map[string]string{
-		"Accept":        "text/event-stream",
-		"Cache-Control": "no-cache",
-		"Connection":    "keep-alive",
+		HttpHeaderAccept:       HttpMIMEEventStream,
+		HttpHeaderCacheControl: "no-cache",
+		HttpHeaderConnection:   "keep-alive",
 	})
 	return c
 }
@@ -144,7 +144,7 @@ func (c *Client) WithToken(token string, Type ...string) *Client {
 	} else {
 		token = "Bearer " + token
 	}
-	c.header.Set("Authorization", token)
+	c.header.Set(HttpHeaderAuthorization, token)
 	return c
 }
 
