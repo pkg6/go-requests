@@ -111,7 +111,7 @@ func defaultHttpClient(localAddr net.Addr) *http.Client {
 }
 
 func New() *Client {
-	return NewHttpClient(defaultHttpClient(nil))
+	return new(Client).Clone()
 }
 
 func NewHttpClient(client *http.Client) *Client {
@@ -121,6 +121,9 @@ func NewHttpClient(client *http.Client) *Client {
 // Clone
 //Parameter initialization
 func (c *Client) Clone() *Client {
+	if c.Client == nil {
+		c.Client = defaultHttpClient(nil)
+	}
 	c.Debug = false
 	c.Query = nil
 	c.BaseUrl = ""
