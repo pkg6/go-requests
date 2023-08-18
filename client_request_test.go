@@ -10,7 +10,7 @@ import (
 func TestClient_Get(t *testing.T) {
 	data := url.Values{}
 	data.Set("k", "v")
-	body, _ := DefaultClient.
+	body, _ := defaultRequest.
 		Get(context.Background(), "http://www.httpbin.org/get", data)
 	defer body.Close()
 	if body.StatusCode != http.StatusOK {
@@ -21,7 +21,7 @@ func TestClient_Get(t *testing.T) {
 func TestClient_Post(t *testing.T) {
 	data := url.Values{}
 	data.Set("k", "v")
-	body, _ := DefaultClient.
+	body, _ := defaultRequest.
 		AsJson().
 		Post(context.Background(), "http://www.httpbin.org/post", data)
 	defer body.Close()
@@ -33,7 +33,7 @@ func TestClient_Post(t *testing.T) {
 func TestClient_Delete(t *testing.T) {
 	data := url.Values{}
 	data.Set("k", "v")
-	body, _ := DefaultClient.
+	body, _ := defaultRequest.
 		AsJson().
 		Delete(context.Background(), "http://www.httpbin.org/delete", data)
 	defer body.Close()
@@ -44,7 +44,7 @@ func TestClient_Delete(t *testing.T) {
 func TestClient_Patch(t *testing.T) {
 	data := url.Values{}
 	data.Set("k", "v")
-	body, _ := DefaultClient.
+	body, _ := defaultRequest.
 		AsJson().
 		Patch(context.Background(), "http://www.httpbin.org/patch", data)
 	defer body.Close()
@@ -55,7 +55,7 @@ func TestClient_Patch(t *testing.T) {
 func TestClient_Put(t *testing.T) {
 	data := url.Values{}
 	data.Set("k", "v")
-	body, _ := DefaultClient.
+	body, _ := defaultRequest.
 		AsJson().
 		Put(context.Background(), "http://www.httpbin.org/put", data)
 	defer body.Close()

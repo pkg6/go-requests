@@ -362,7 +362,7 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 	if len(c.header) > 0 {
 		request.Header = c.header
 	}
-	if reqHeaderHost := request.Header.Get(httpHeaderHost); reqHeaderHost != "" {
+	if reqHeaderHost := request.Header.Get(HttpHeaderHost); reqHeaderHost != "" {
 		request.Host = reqHeaderHost
 	}
 	return request, nil

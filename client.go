@@ -16,16 +16,27 @@ import (
 )
 
 const (
-	httpSchemeName            = `http`
-	httpParamFileHolder       = `@file:`
-	httpRegexParamJson        = `^[\w\[\]]+=.+`
-	httpHeaderHost            = `Host`
-	httpHeaderCookie          = `Cookie`
-	HttpHeaderUserAgent       = `User-Agent`
-	HttpHeaderContentType     = `Content-Type`
-	HttpHeaderContentTypeJson = `application/json`
-	HttpHeaderContentTypeXml  = `application/xml`
-	HttpHeaderContentTypeForm = `application/x-www-form-urlencoded`
+	httpSchemeName      = `http`
+	httpParamFileHolder = `@file:`
+	httpRegexParamJson  = `^[\w\[\]]+=.+`
+
+	HttpHeaderHost   = `Host`
+	HttpHeaderCookie = `Cookie`
+
+	HttpHeaderUserAgent     = `User-Agent`
+	HttpHeaderAuthorization = "Authorization"
+	HttpHeaderAccept        = "Accept"
+	HttpMIMEEventStream     = "text/event-stream"
+	HttpHeaderCacheControl  = "Cache-Control"
+	HttpHeaderConnection    = "Connection"
+	HttpHeaderContentType   = `Content-Type`
+
+	charsetUTF8                          = "charset=UTF-8"
+	HttpHeaderContentTypeJson            = `application/json`
+	HttpHeaderContentTypeJsonCharsetUTF8 = HttpHeaderContentTypeJson + "; " + charsetUTF8
+	HttpHeaderContentTypeXml             = `application/xml`
+	HttpHeaderContentTypeXmlCharsetUTF8  = HttpHeaderContentTypeXml + "; " + charsetUTF8
+	HttpHeaderContentTypeForm            = `application/x-www-form-urlencoded`
 )
 
 var (
@@ -34,7 +45,7 @@ var (
 	defaultClientAgent = fmt.Sprintf(`pkg6/go-request client at  %s`, hostname)
 	defaultRetryCount  = 3
 	defaultWaitTime    = time.Duration(2000) * time.Millisecond
-	DefaultClient      = New()
+	defaultRequest     = New()
 )
 
 type (
