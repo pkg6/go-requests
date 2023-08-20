@@ -126,9 +126,6 @@ func TestMd5(t *testing.T) {
 }
 
 func TestMd5File(t *testing.T) {
-	type args struct {
-		path string
-	}
 	tests := []struct {
 		name string
 		path string
@@ -175,7 +172,7 @@ func TestMd5Reader(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.file.Seek(0, 0)
+			_, _ = tt.file.Seek(0, 0)
 			got, _ := Md5Reader(tt.file)
 			if got != tt.want {
 				t.Errorf("Md5Reader() got = %v, want %v", got, tt.want)

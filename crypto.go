@@ -54,9 +54,11 @@ func Base64Decode(str string) (string, error) {
 
 func Base64File(path string) (string, error) {
 	f, err := os.Open(path)
-	defer f.Close()
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf(`os.Open failed for name "%s"`, path))
+		return "", fmt.Errorf(`os.Open failed for name "%s"`, path)
 	}
 	return Base64Reader(f)
 }
@@ -68,7 +70,7 @@ func Base64StdEncoding(base64Str string) io.Reader {
 func Base64Reader(reader io.Reader) (string, error) {
 	fd, err := io.ReadAll(reader)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf(`io.ReadAll failed  "%v"`, err))
+		return "", fmt.Errorf(`io.ReadAll failed  "%v"`, err)
 	}
 	return base64.StdEncoding.EncodeToString(fd), nil
 }
@@ -76,7 +78,7 @@ func Base64Reader(reader io.Reader) (string, error) {
 func Md5File(path string) (string, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf(`os.Open failed for name "%s"`, path))
+		return "", fmt.Errorf(`os.Open failed for name "%s"`, path)
 	}
 	defer f.Close()
 	return Md5Reader(f)

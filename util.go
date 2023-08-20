@@ -123,7 +123,7 @@ func Uri(uri string, query ...url.Values) *url.URL {
 	u, _ := url.Parse(uri)
 	q := u.Query()
 	for _, value := range query {
-		for k, _ := range value {
+		for k := range value {
 			q.Set(k, value.Get(k))
 		}
 	}
@@ -134,7 +134,7 @@ func Uri(uri string, query ...url.Values) *url.URL {
 func UrlValues(uvs ...url.Values) url.Values {
 	query := url.Values{}
 	for _, value := range uvs {
-		for k, _ := range value {
+		for k := range value {
 			query.Set(k, value.Get(k))
 		}
 	}

@@ -6,7 +6,7 @@
 
 ## 基本介绍
 
-`GoRequests`框架提供了强大便捷易用的HTTP客户端，基于`http.Client`进行扩展开发，对象创建可以通过`requests.New()`包方法，也可以通过`new(requests.Client).Clone()`方法调用，同时你还可以使用`requests.NewHttpClient(requests.HttpClient(nil))`创建对象。推荐使用`new(requests.Client).Clone()`来便捷地创建HTTP客户端对象。
+`GoRequests`框架提供了强大便捷易用的HTTP客户端，基于`http.Client`进行扩展开发，对象创建可以通过`requests.New()`包方法，也可以通过`new(requests.Client).Clone()`方法调用，同时你还可以使用`requests.NewHttpClient(requests.DefaultHttpClient(nil))`创建对象。推荐使用`new(requests.Client).Clone()`来便捷地创建HTTP客户端对象。
 
 ## 安装
 

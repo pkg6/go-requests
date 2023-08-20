@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+var defaultRequest = New()
+
 func TestClient_Get(t *testing.T) {
 	data := url.Values{}
 	data.Set("k", "v")
