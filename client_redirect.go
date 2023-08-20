@@ -99,3 +99,46 @@ func checkHostAndAddHeaders(request *http.Request, response *http.Request) {
 		request.Header.Set(hdrUserAgentKey, defaultClientAgent)
 	}
 }
+
+// WithRedirectLimit limits the number of jumps.
+func (c *Client) WithRedirectLimit(redirectLimit int) *Client {
+	c.WithRedirectPolicy(func(req *http.Request, via []*http.Request) error {
+		if len(via) >= redirectLimit {
+			return http.ErrUseLastResponse
+		}
+		return nil
+	})
+	return c
+}
+
+// WithRedirectPolicy method sets the client redirect poilicy. Resty provides ready to use
+// redirect policies. Wanna create one for yourself refer to `redirect.go`.
+//	WithRedirectLimit(20)
+//	WithRedirectPolicy(FlexibleRedirectPolicy(20))
+//	WithRedirectPolicy(FlexibleRedirectPolicy(20), DomainCheckRedirectPolicy("host1.com", "host2.net"))
+func (c *Client) WithRedirectPolicy(policies ...any) *Client {
+	if len(policies) == 1 {
+		if checkRedirect, ok := policies[0].(func(req *http.Request, via []*http.Request) error); ok {
+			c.WithCheckRedirect(checkRedirect)
+			return c
+		}
+	}
+	c.WithCheckRedirect(func(req *http.Request, via []*http.Request) error {
+		for _, p := range policies {
+			if _, ok := p.(RedirectPolicy); ok {
+				if err := p.(RedirectPolicy).Apply(req, via); err != nil {
+					return err
+				}
+			} else {
+				c.Logger.Fatalf("%v does not implement resty.RedirectPolicy (missing Apply method)", functionName(p))
+			}
+		}
+		// looks good, go ahead
+		return nil
+	})
+	return c
+}
+
+func (c *Client) WithCheckRedirect(fn func(req *http.Request, via []*http.Request) error) {
+	c.CheckRedirect = fn
+}
