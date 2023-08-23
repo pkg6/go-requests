@@ -22,7 +22,7 @@ func TestBase64Decode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Base64Decode(tt.args.str)
-			if (err != nil) != tt.wantErr {
+			if err != nil != tt.wantErr {
 				t.Errorf("Base64Decode() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -68,7 +68,7 @@ func TestBase64File(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Base64File(tt.args.path)
-			if (err != nil) != tt.wantErr {
+			if err != nil != tt.wantErr {
 				t.Errorf("Base64File() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -94,7 +94,7 @@ func TestBase64Reader(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Base64Reader(tt.args.reader)
-			if (err != nil) != tt.wantErr {
+			if err != nil != tt.wantErr {
 				t.Errorf("Base64Reader() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -236,7 +236,7 @@ func TestURLDecode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := URLDecode(tt.args.str)
-			if (err != nil) != tt.wantErr {
+			if err != nil != tt.wantErr {
 				t.Errorf("URLDecode() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
