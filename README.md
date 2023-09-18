@@ -65,35 +65,36 @@ import (
 )
 
 func main() {
-	payload := map[string]interface{}{
-		"messages": []map[string]string{
-			{
-				"role":    "user",
-				"content": "你好",
-			},
-		},
-		"stream":            true,
-		"max_tokens":        800,
-		"temperature":       0.7,
-		"frequency_penalty": 0,
-		"presence_penalty":  0,
-		"top_p":             0.95,
-		"stop":              nil,
-	}
+	payload := `{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an AI assistant that helps people find information."
+    },
+    {
+      "role": "user",
+      "content": "你是谁"
+    }
+  ],
+  "model":"gpt-35-turbo",
+  "temperature": 0.7,
+  "top_p": 0.95,
+  "frequency_penalty": 0,
+  "presence_penalty": 0,
+  "max_tokens": 800,
+  "stop": null,
+  "stream":true 
+}`
+
 	json, _ := requests.PostJson("end-point url", payload, func(client *requests.Client) {
 		client.WithHeader("api-key", "api-key")
-		client.AsStream()
 	})
 	defer json.Close()
-	json.ReadStream(requests.ReadStreamArgs{
-		DataPrefix:  []byte("data: "),
-		ErrorPrefix: []byte(`data: {"error":`),
-		EndPrefix:   []byte("[DONE]"),
-		Callback: func(line []byte) {
-			fmt.Println(string(line))
-		},
+	json.ReadStream(func(line []byte, number int64) {
+		fmt.Println(string(line))
 	})
 }
+
 ~~~
 
 ## 返回对象

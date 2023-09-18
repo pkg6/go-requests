@@ -58,14 +58,14 @@ func (c *Client) AsForm() *Client {
 }
 
 // AsStream is a Stream
-func (c *Client) AsStream() *Client {
-	c.WithHeaders(map[string]string{
-		HttpHeaderAccept:       HttpMIMEEventStream,
-		HttpHeaderCacheControl: "no-cache",
-		HttpHeaderConnection:   "keep-alive",
-	})
-	return c
-}
+//func (c *Client) AsStream() *Client {
+//	c.WithHeaders(map[string]string{
+//		HttpHeaderAccept:       HttpMIMEEventStream,
+//		HttpHeaderCacheControl: "no-cache",
+//		HttpHeaderConnection:   "keep-alive",
+//	})
+//	return c
+//}
 
 // AsJson is a chaining function,
 // which sets the HTTP content type as "application/json" for the next request.
