@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -115,6 +116,11 @@ func IsJSONType(s string) bool {
 func IsXMLType(s string) bool {
 	return IsMatchString(`(?i:(application|text)/(xml|.*\+xml)(;|$))`, s)
 }
+
+func IsStreamType(s string) bool {
+	return strings.Contains(s, "event-stream")
+}
+
 func functionName(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }

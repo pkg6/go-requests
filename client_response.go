@@ -2,7 +2,6 @@ package requests
 
 import (
 	"bufio"
-	"bytes"
 	"io"
 	"net/http"
 )
@@ -87,60 +86,47 @@ func (r *Response) ReadAll() []byte {
 	return body
 }
 
-// ReadStreamArgs
-//openai ChatGPT: requests.ReadStreamArgs{
-//		DataPrefix:  []byte("data: "),
-//		ErrorPrefix: []byte(`data: {"error":`),
-//		EndPrefix:   []byte("[DONE]"),
-//		Callback: func(line []byte) {
-//			fmt.Println(string(line))
-//		},
-//	}
-type ReadStreamArgs struct {
-	DataPrefix  []byte
-	ErrorPrefix []byte
-	EndPrefix   []byte
-	Callback    func(line []byte)
-}
-
-func (r *Response) ReadStream(readStreamArgs ReadStreamArgs) uint {
-	var (
-		emptyMessagesCount uint
-		hasErrorPrefix     bool
-		emptyArgs          bool
-	)
-	if readStreamArgs.DataPrefix == nil ||
-		readStreamArgs.ErrorPrefix == nil ||
-		readStreamArgs.EndPrefix == nil ||
-		readStreamArgs.Callback == nil {
-		emptyArgs = true
+// ReadStream
+//Microsoft ChatGPT Data Structure start
+//data: {"id":"","object":"","created":0,"model":"","prompt_filter_results":[{"prompt_index":0,"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":{"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"choices":[],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"role":"assistant"},"content_filter_results":{}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"我"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"是"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"一个"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual{"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"AI"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":{"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"助"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"手"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"，"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"可以"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual{"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"帮"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"助"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"您"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"查"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"找"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"信息"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual{"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":null,"delta":{"content":"。"},"content_filter_results":{"hate":{"filtered":false,"severity":"safe"},"self_harm":{"filtered":false,"severity":"safe"},"sexual":"filtered":false,"severity":"safe"},"violence":{"filtered":false,"severity":"safe"}}}],"usage":null}
+//data: {"id":"chatcmpl-801dpnRDRT0u4Nx5tec615WTJOXJt","object":"chat.completion.chunk","created":1695017001,"model":"gpt-35-turbo","choices":[{"index":0,"finish_reason":"stop","delta":{},"content_filter_results":{}}],"usage":null}
+//data: [DONE]
+//Microsoft ChatGPT Data Structure end
+func (r *Response) ReadStream(lineNumberFun func(line []byte, number int64)) int64 {
+	var number int64
+	if r.IsError() {
+		return number
 	}
-	if emptyArgs || r.IsError() {
-		return emptyMessagesCount
+	if !IsStreamType(r.ContentType()) {
+		lineNumberFun(r.ReadAll(), number)
+		return number
 	}
+	b := bufio.NewReader(r.Response.Body)
 	for {
-		rawLine, err := bufio.NewReader(r.Response.Body).ReadBytes('\n')
+		rawLine, _, err := b.ReadLine()
 		if err != nil {
 			break
 		}
-		spaceLine := bytes.TrimSpace(rawLine)
-		if bytes.HasPrefix(spaceLine, readStreamArgs.ErrorPrefix) {
-			hasErrorPrefix = true
-		}
-		if !bytes.HasPrefix(spaceLine, readStreamArgs.DataPrefix) || hasErrorPrefix {
-			if hasErrorPrefix {
-				spaceLine = bytes.TrimPrefix(spaceLine, readStreamArgs.DataPrefix)
-			}
-			emptyMessagesCount++
-			continue
-		}
-		noPrefixLine := bytes.TrimPrefix(spaceLine, readStreamArgs.DataPrefix)
-		if string(noPrefixLine) == string(readStreamArgs.EndPrefix) {
-			break
-		}
-		readStreamArgs.Callback(noPrefixLine)
+		lineNumberFun(rawLine, number)
+		number += 1
 	}
-	return emptyMessagesCount
+	return number
 }
 
 // ReadAllString retrieves and returns the response content as string.
