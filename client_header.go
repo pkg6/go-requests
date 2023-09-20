@@ -8,6 +8,8 @@ import "encoding/base64"
 //		WithHeader("Content-Type", "application/json").
 //		WithHeader("Accept", "application/json")
 func (c *Client) WithHeader(header, value string) *Client {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	c.header.Set(header, value)
 	return c
 }

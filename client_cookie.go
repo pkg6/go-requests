@@ -17,6 +17,8 @@ func (c *Client) WithCookieJar(jar http.CookieJar) *Client {
 	return c
 }
 func (c *Client) WithCookie(k, v string) *Client {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	c.cookies[k] = v
 	return c
 }
@@ -27,6 +29,8 @@ func (c *Client) WithCookies(cookies map[string]string) *Client {
 	return c
 }
 func (c *Client) WithCookieString(cookie string) *Client {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	if cookie == "" {
 		cookie = MapCookiesToString(c.cookies, cookie)
 	}

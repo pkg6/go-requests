@@ -84,6 +84,7 @@ type Client struct {
 	traceContext           traceContext
 	trace                  bool
 	attempt                int
+	clone                  int
 }
 
 // DefaultHttpClient
@@ -157,6 +158,7 @@ func (c *Client) Clone() *Client {
 	c.OnAfterRequest(requestLogger)
 	c.OnResponse(responseLogger)
 	c.attempt = 1
+	c.clone += 1
 	return c
 }
 
@@ -238,15 +240,10 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 			auth = nil
 		}
 		// refer to the source code, error is always nil
-		dialer, err := proxy.SOCKS5(
-			"tcp",
-			_proxy.Host,
-			auth,
-			&net.Dialer{
-				Timeout:   c.Client.Timeout,
-				KeepAlive: c.Client.Timeout,
-			},
-		)
+		dialer, err := proxy.SOCKS5("tcp", _proxy.Host, auth, &net.Dialer{
+			Timeout:   c.Client.Timeout,
+			KeepAlive: c.Client.Timeout,
+		})
 		if err != nil {
 			c.Logger.Fatalf(`%+v`, err)
 			return c
