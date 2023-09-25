@@ -3,7 +3,7 @@ package requests
 import (
 	"context"
 	"fmt"
-	"github.com/pkg6/go-requests/jsons"
+	"github.com/pkg6/jsons"
 	"io"
 	"net/http"
 	"time"
