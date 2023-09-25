@@ -6,7 +6,7 @@ import (
 	"crypto/tls"
 	"encoding/xml"
 	"fmt"
-	"github.com/pkg6/go-requests/jsons"
+	"github.com/pkg6/jsons"
 	"golang.org/x/net/proxy"
 	"log"
 	"net"
@@ -141,7 +141,6 @@ func (c *Client) Clone() *Client {
 	c.responseCallbacks = make([]responseCallback, 0)
 	c.successHooks = make([]SuccessHook, 0)
 	c.errorHooks = make([]ErrorHook, 0)
-	//refer to https://github.com/gin-gonic/gin/tree/master/internal/json
 	c.jsonMarshal = jsons.Marshal
 	c.jsonUnmarshal = jsons.Unmarshal
 	if c.xmlMarshal == nil {

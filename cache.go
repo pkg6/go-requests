@@ -2,7 +2,7 @@ package requests
 
 import (
 	"fmt"
-	"github.com/pkg6/go-requests/jsons"
+	"github.com/pkg6/jsons"
 	"os"
 	"path"
 	"path/filepath"

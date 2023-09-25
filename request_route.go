@@ -54,10 +54,10 @@ func (r *Route) GetD() any {
 // route := &requests.Route{
 //		Uri:    "https://api.github.com/users/github",
 //		Method: http.MethodGet,
-//		D:      &tests.GitHubUser{},
+//		D:      &.tests.GitHubUser{},
 //	}
 //	_ = requests.RequestRoute(route)
-//	fmt.Println(route.GetD().(*tests.GitHubUser))
+//	fmt.Println(route.GetD().(*.tests.GitHubUser))
 func RequestRoute(route IRoute) error {
 	client := new(Client).Clone().WitchHttpClient(DefaultHttpClient(nil))
 	client.WithHeaders(route.GetHeader())

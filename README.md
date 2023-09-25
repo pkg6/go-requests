@@ -2,7 +2,6 @@
 [![Go.Dev reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/pkg6/go-requests?tab=doc)
 [![Sourcegraph](https://sourcegraph.com/github.com/pkg6/go-requests/-/badge.svg)](https://sourcegraph.com/github.com/pkg6/go-requests?badge)
 [![Release](https://img.shields.io/github/release/pkg6/go-requests.svg?style=flat-square)](https://github.com/pkg6/go-requests/releases)
-[![Goproxy.cn](https://goproxy.cn/stats/github.com/pkg6/go-requests/badges/download-count.svg)](https://goproxy.cn)
 
 ## 基本介绍
 
