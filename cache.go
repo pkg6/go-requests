@@ -1,8 +1,8 @@
 package requests
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/pkg6/jsons"
 	"os"
 	"path"
 	"path/filepath"
@@ -57,7 +57,7 @@ func (f *FileCache) Set(key, value string, ttl time.Duration) error {
 	if err != nil {
 		return err
 	}
-	cacheValue, err := jsons.Marshal(item)
+	cacheValue, err := json.Marshal(item)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (f *FileCache) getCacheItemByCacheFile(cacheFile string) (item cacheItem, e
 	if err != nil {
 		return item, err
 	}
-	if err = jsons.Unmarshal(fileItem, &item); err != nil {
+	if err = json.Unmarshal(fileItem, &item); err != nil {
 		return item, err
 	}
 	var zeroT time.Time

@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/tls"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/pkg6/jsons"
 	"golang.org/x/net/proxy"
 	"log"
 	"net"
@@ -141,8 +141,8 @@ func (c *Client) Clone() *Client {
 	c.responseCallbacks = make([]responseCallback, 0)
 	c.successHooks = make([]SuccessHook, 0)
 	c.errorHooks = make([]ErrorHook, 0)
-	c.jsonMarshal = jsons.Marshal
-	c.jsonUnmarshal = jsons.Unmarshal
+	c.jsonMarshal = json.Marshal
+	c.jsonUnmarshal = json.Unmarshal
 	if c.xmlMarshal == nil {
 		c.SetXMLMarshaler(xml.Marshal)
 	}
