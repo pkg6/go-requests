@@ -3,7 +3,6 @@ package requests
 import (
 	"context"
 	"fmt"
-	"github.com/pkg6/jsons"
 	"io"
 	"net/http"
 	"time"
@@ -20,7 +19,7 @@ func requestLogger(client *Client, request *http.Request) error {
 			request.Body = NewReadCloser(body, false)
 		}
 		client.Context = context.WithValue(context.Background(), requestLogCtxKey, now)
-		headers, _ := jsons.Marshal(request.Header)
+		headers, _ := client.jsonMarshal(request.Header)
 		reqLog := "\n==============================================================================\n" +
 			"~~~ REQUEST ~~~\n" +
 			fmt.Sprintf("%s  %s  %s\n", request.Method, request.URL.RequestURI(), request.Proto) +
@@ -43,7 +42,7 @@ func responseLogger(client *Client, request *http.Request, response *Response) e
 			response.Body = NewReadCloser(reqBodyContent, false)
 		}
 		s := client.Context.Value(requestLogCtxKey).(time.Time)
-		headers, _ := jsons.Marshal(response.Header)
+		headers, _ := client.jsonMarshal(response.Header)
 		debugLog := "~~~ RESPONSE ~~~\n" +
 			fmt.Sprintf("CLONE        : %v\n", client.clone) +
 			fmt.Sprintf("STATUS       : %s\n", response.Status) +
