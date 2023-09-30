@@ -17,25 +17,12 @@ func (c *Client) WithCookieJar(jar http.CookieJar) *Client {
 	return c
 }
 func (c *Client) WithCookie(k, v string) *Client {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-	c.cookies[k] = v
+	c.Cookie.Set(k, v)
 	return c
 }
 func (c *Client) WithCookies(cookies map[string]string) *Client {
 	for k, v := range cookies {
 		c.WithCookie(k, v)
-	}
-	return c
-}
-func (c *Client) WithCookieString(cookie string) *Client {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-	if cookie == "" {
-		cookie = MapCookiesToString(c.cookies, cookie)
-	}
-	if cookie != "" {
-		c.WithHeader(HttpHeaderCookie, cookie)
 	}
 	return c
 }

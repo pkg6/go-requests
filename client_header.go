@@ -10,7 +10,7 @@ import "encoding/base64"
 func (c *Client) WithHeader(header, value string) *Client {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	c.header.Set(header, value)
+	c.Header.Set(header, value)
 	return c
 }
 
@@ -24,7 +24,7 @@ func (c *Client) WithHeader(header, value string) *Client {
 //		})
 func (c *Client) WithHeaders(headers map[string]string) *Client {
 	for h, v := range headers {
-		c.header.Set(h, v)
+		c.Header.Set(h, v)
 	}
 	return c
 }
@@ -37,7 +37,7 @@ func (c *Client) WithHeaders(headers map[string]string) *Client {
 //
 // Also you can override header value, which was set at client instance level.
 func (c *Client) WithHeaderVerbatim(header, value string) *Client {
-	c.header[header] = []string{value}
+	c.Header[header] = []string{value}
 	return c
 }
 
@@ -102,6 +102,6 @@ func (c *Client) WithToken(token string, Type ...string) *Client {
 	} else {
 		token = "Bearer " + token
 	}
-	c.header.Set(HttpHeaderAuthorization, token)
+	c.Header.Set(HttpHeaderAuthorization, token)
 	return c
 }

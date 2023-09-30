@@ -158,7 +158,7 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 func (c *Client) prepareBody(method string, body any) (string, error) {
 	var params string
 	if body != nil {
-		contentType := c.header.Get(HttpHeaderContentType)
+		contentType := c.Header.Get(HttpHeaderContentType)
 		if IsJSONType(contentType) {
 			switch body.(type) {
 			case string, []byte:
@@ -206,7 +206,7 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 	if method == http.MethodGet {
 		var bodyBuffer *bytes.Buffer
 		if params != "" {
-			contentType := c.header.Get(HttpHeaderContentType)
+			contentType := c.Header.Get(HttpHeaderContentType)
 			if IsJSONType(contentType) || IsXMLType(contentType) {
 				bodyBuffer = bytes.NewBuffer([]byte(params))
 			} else {
@@ -228,7 +228,7 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 		if request, err = http.NewRequest(method, uri, bytes.NewReader(paramBytes)); err != nil {
 			return nil, fmt.Errorf(`http.NewRequest failed for method "%s" and URL "%s"`, method, uri)
 		} else {
-			if v := c.header.Get(HttpHeaderContentType); v != "" {
+			if v := c.Header.Get(HttpHeaderContentType); v != "" {
 				// Custom Content-Type.
 				request.Header.Set(HttpHeaderContentType, v)
 			} else if len(paramBytes) > 0 {
@@ -247,10 +247,12 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 		request = request.WithContext(withContext)
 	}
 	//加载cookie
-	c.WithCookieString("")
+	if len(c.Cookie) > 0 {
+		c.Header.Set(HttpHeaderCookie, c.Cookie.Encode())
+	}
 	// Custom header.
-	if len(c.header) > 0 {
-		request.Header = c.header
+	if len(c.Header) > 0 {
+		request.Header = c.Header
 	}
 	if reqHeaderHost := request.Header.Get(HttpHeaderHost); reqHeaderHost != "" {
 		request.Host = reqHeaderHost

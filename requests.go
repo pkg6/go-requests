@@ -27,11 +27,7 @@ func WithCookies(cookies map[string]string) ArgsFunc {
 		client.WithCookies(cookies)
 	}
 }
-func WithCookieString(cookies string) ArgsFunc {
-	return func(client *Client) {
-		client.WithCookieString(cookies)
-	}
-}
+
 func WithHeader(header, value string) ArgsFunc {
 	return func(client *Client) {
 		client.WithHeader(header, value)
