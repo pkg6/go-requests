@@ -61,12 +61,13 @@ type (
 
 type Client struct {
 	*http.Client
-	BaseUrl                string
-	Debug                  bool
-	Query                  url.Values
+	BaseUrl string
+	Debug   bool
+	Query   url.Values
+
+	Header                 http.Header
+	Cookie                 Cookie
 	Logger                 *log.Logger
-	header                 http.Header
-	cookies                map[string]string
 	jsonMarshal            func(v any) ([]byte, error)
 	jsonUnmarshal          func(data []byte, v any) error
 	xmlMarshal             func(v any) ([]byte, error)
@@ -132,8 +133,8 @@ func (c *Client) Clone() *Client {
 	c.Debug = false
 	c.Query = nil
 	c.BaseUrl = ""
-	c.header = make(http.Header, 0)
-	c.cookies = make(map[string]string, 0)
+	c.Header = make(http.Header, 0)
+	c.Cookie = make(Cookie, 0)
 	c.retryWaitTime = defaultWaitTime
 	c.retryCount = defaultRetryCount
 	c.beforeRequestCallbacks = make([]clientCallback, 0)
@@ -152,7 +153,7 @@ func (c *Client) Clone() *Client {
 	if c.Logger == nil {
 		c.Logger = log.Default()
 	}
-	if c.header.Get(HttpHeaderUserAgent) == "" {
+	if c.Header.Get(HttpHeaderUserAgent) == "" {
 		c.WithUserAgent(defaultClientAgent)
 	}
 	c.OnAfterRequest(requestLogger)
