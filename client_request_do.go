@@ -26,17 +26,17 @@ func (c *Client) DoRequestD(ctx context.Context, method string, uri string, data
 	return response.Unmarshal(d)
 }
 
-func (c *Client) DoRequestBytes(ctx context.Context, method string, uri string, data any) []byte {
+func (c *Client) DoRequestBytes(ctx context.Context, method string, uri string, data any) ([]byte, error) {
 	response, err := c.DoRequest(ctx, method, uri, data)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	defer func() {
 		if err = response.Close(); err != nil {
 			c.Logger.Fatalf("%v", err)
 		}
 	}()
-	return response.ReadAll()
+	return response.ReadAll(), nil
 }
 
 func (c *Client) DoRequest(ctx context.Context, method, uri string, body any) (response *Response, err error) {
