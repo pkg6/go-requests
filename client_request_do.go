@@ -197,7 +197,7 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 		uri = httpSchemeName + "://" + uri
 	}
 	if c.Query != nil {
-		uri = Uri(uri, c.Query).String()
+		uri = URIQuery(uri, c.Query).String()
 	}
 	params, err := c.prepareBody(method, body)
 	if err != nil {

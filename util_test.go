@@ -103,7 +103,7 @@ func TestUri(t *testing.T) {
 	)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Uri(tt.args.uri, tt.args.query...); !reflect.DeepEqual(got, tt.want) {
+			if got := URIQuery(tt.args.uri, tt.args.query...); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Uri() = %v, want %v", got, tt.want)
 			}
 		})

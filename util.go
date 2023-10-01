@@ -125,7 +125,7 @@ func functionName(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }
 
-func Uri(uri string, query ...url.Values) *url.URL {
+func URIQuery(uri string, query ...url.Values) *url.URL {
 	u, _ := url.Parse(uri)
 	q := u.Query()
 	for _, value := range query {
