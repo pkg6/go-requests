@@ -19,7 +19,7 @@ func requestLogger(client *Client, request *http.Request) error {
 			request.Body = NewReadCloser(body, false)
 		}
 		client.ctx = context.WithValue(context.Background(), ctxDebugStartTime, now)
-		headers, _ := client.jsonMarshal(request.Header)
+		headers, _ := client.JSONMarshal(request.Header)
 		reqLog := "\n==============================================================================\n" +
 			"~~~ REQUEST ~~~\n" +
 			fmt.Sprintf("%s  %s  %s\n", request.Method, request.URL.RequestURI(), request.Proto) +
@@ -42,7 +42,7 @@ func responseLogger(client *Client, request *http.Request, response *Response) e
 			response.Body = NewReadCloser(reqBodyContent, false)
 		}
 		s := client.ctx.Value(ctxDebugStartTime).(time.Time)
-		headers, _ := client.jsonMarshal(response.Header)
+		headers, _ := client.JSONMarshal(response.Header)
 		debugLog := "~~~ RESPONSE ~~~\n" +
 			fmt.Sprintf("CLONE        : %v\n", client.clone) +
 			fmt.Sprintf("STATUS       : %s\n", response.Status) +
