@@ -1,3 +1,4 @@
+[![Test Status](https://github.com/pkg6/go-requests/actions/workflows/go-test.yml/badge.svg)](https://github.com/pkg6/go-requests/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pkg6/go-requests)](https://goreportcard.com/report/github.com/pkg6/go-requests)
 [![Go.Dev reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/pkg6/go-requests?tab=doc)
 [![Sourcegraph](https://sourcegraph.com/github.com/pkg6/go-requests/-/badge.svg)](https://sourcegraph.com/github.com/pkg6/go-requests?badge)
