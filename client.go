@@ -86,7 +86,7 @@ type Client struct {
 	trace                  bool
 	attempt                int
 	clone                  int
-	Context                context.Context
+	ctx                    context.Context
 }
 
 // DefaultHttpClient
