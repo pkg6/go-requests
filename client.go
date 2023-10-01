@@ -46,7 +46,7 @@ const (
 var (
 	hdrUserAgentKey    = http.CanonicalHeaderKey(HttpHeaderUserAgent)
 	hostname, _        = os.Hostname()
-	defaultClientAgent = fmt.Sprintf(`pkg6/go-request client at  %s`, hostname)
+	defaultClientAgent = fmt.Sprintf(`github.com/pkg6/go-requests  at  %s`, hostname)
 	defaultRetryCount  = 3
 	defaultWaitTime    = time.Duration(2000) * time.Millisecond
 )
@@ -65,13 +65,14 @@ type Client struct {
 	Debug   bool
 	Query   url.Values
 
-	Header                 http.Header
-	Cookie                 Cookie
-	Logger                 *log.Logger
-	jsonMarshal            func(v any) ([]byte, error)
-	jsonUnmarshal          func(data []byte, v any) error
-	xmlMarshal             func(v any) ([]byte, error)
-	xmlUnmarshal           func(data []byte, v any) error
+	Header        http.Header
+	Cookie        Cookie
+	Logger        *log.Logger
+	JSONMarshal   func(v any) ([]byte, error)
+	JSONUnmarshal func(data []byte, v any) error
+	XMLMarshal    func(v any) ([]byte, error)
+	XMLUnmarshal  func(data []byte, v any) error
+
 	middlewares            []MiddlewareFunc
 	beforeRequestCallbacks []clientCallback
 	afterRequestCallbacks  []requestCallback
@@ -142,12 +143,16 @@ func (c *Client) Clone() *Client {
 	c.responseCallbacks = make([]responseCallback, 0)
 	c.successHooks = make([]SuccessHook, 0)
 	c.errorHooks = make([]ErrorHook, 0)
-	c.jsonMarshal = json.Marshal
-	c.jsonUnmarshal = json.Unmarshal
-	if c.xmlMarshal == nil {
+	if c.JSONMarshal == nil {
+		c.SetJSONMarshaler(json.Marshal)
+	}
+	if c.JSONUnmarshal == nil {
+		c.SetJSONUnmarshaler(json.Unmarshal)
+	}
+	if c.XMLMarshal == nil {
 		c.SetXMLMarshaler(xml.Marshal)
 	}
-	if c.xmlUnmarshal == nil {
+	if c.XMLUnmarshal == nil {
 		c.SetXMLUnmarshaler(xml.Unmarshal)
 	}
 	if c.Logger == nil {
@@ -183,17 +188,29 @@ func (c *Client) SetDebug(debug bool) *Client {
 	return c
 }
 
+// SetJSONMarshaler method sets the JSON marshaler function to marshal the request body.
+// By default,  uses `encoding/json` package to marshal the request body.
+func (c *Client) SetJSONMarshaler(marshaler func(v interface{}) ([]byte, error)) *Client {
+	c.JSONMarshal = marshaler
+	return c
+}
+
+// SetJSONUnmarshaler method sets the JSON unmarshaler function to unmarshal the response body.
+func (c *Client) SetJSONUnmarshaler(unmarshaler func(data []byte, v interface{}) error) *Client {
+	c.JSONUnmarshal = unmarshaler
+	return c
+}
+
 // SetXMLMarshaler method sets the XML marshaler function to marshal the request body.
-// By default, Resty uses `encoding/xml` package to marshal the request body.
 func (c *Client) SetXMLMarshaler(marshaler func(v any) ([]byte, error)) *Client {
-	c.xmlMarshal = marshaler
+	c.XMLMarshal = marshaler
 	return c
 }
 
 // SetXMLUnmarshaler method sets the XML unmarshaler function to unmarshal the response body.
-// By default, Resty uses `encoding/xml` package to unmarshal the response body.
+// By default,  uses `encoding/xml` package to unmarshal the response body.
 func (c *Client) SetXMLUnmarshaler(unmarshaler func(data []byte, v any) error) *Client {
-	c.xmlUnmarshal = unmarshaler
+	c.XMLUnmarshal = unmarshaler
 	return c
 }
 
@@ -287,9 +304,9 @@ func (c *Client) SetTLSConfig(tlsConfig *tls.Config) *Client {
 // Unmarshal content into object from JSON or XML
 func (c *Client) Unmarshal(contentType string, b []byte, d any) (err error) {
 	if IsJSONType(contentType) {
-		err = c.jsonUnmarshal(b, d)
+		err = c.JSONUnmarshal(b, d)
 	} else if IsXMLType(contentType) {
-		err = c.xmlUnmarshal(b, d)
+		err = c.XMLUnmarshal(b, d)
 	}
 	return
 }

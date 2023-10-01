@@ -146,9 +146,9 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 		return HttpBuildQuery(val)
 	}
 	if method == http.MethodGet && body != nil {
-		if jsonByte, err := c.jsonMarshal(body); err == nil {
+		if jsonByte, err := c.JSONMarshal(body); err == nil {
 			mapAny := make(map[string]any)
-			if err = c.jsonUnmarshal(jsonByte, &mapAny); err == nil {
+			if err = c.JSONUnmarshal(jsonByte, &mapAny); err == nil {
 				return HttpBuildQuery(mapAny)
 			}
 		}
@@ -164,7 +164,7 @@ func (c *Client) prepareBody(method string, body any) (string, error) {
 			case string, []byte:
 				params = ToString(body)
 			default:
-				if b, err := c.jsonMarshal(body); err != nil {
+				if b, err := c.JSONMarshal(body); err != nil {
 					return "", err
 				} else {
 					params = string(b)
@@ -175,7 +175,7 @@ func (c *Client) prepareBody(method string, body any) (string, error) {
 			case string, []byte:
 				params = ToString(body)
 			default:
-				if b, err := c.xmlMarshal(body); err != nil {
+				if b, err := c.XMLMarshal(body); err != nil {
 					return "", err
 				} else {
 					params = string(b)

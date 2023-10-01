@@ -13,7 +13,7 @@ var (
 )
 
 type (
-	// RedirectPolicy to regulate the redirects in the resty client.
+	// RedirectPolicy to regulate the redirects in the  client.
 	// Objects implementing the RedirectPolicy interface can be registered as
 	//
 	// Apply function should return nil to continue the redirect jounery, otherwise
@@ -54,7 +54,7 @@ func FlexibleRedirectPolicy(noOfRedirect int) RedirectPolicy {
 	})
 }
 
-// DomainCheckRedirectPolicy is convenient method to define domain name redirect rule in resty client.
+// DomainCheckRedirectPolicy is convenient method to define domain name redirect rule in  client.
 // Redirect is allowed for only mentioned host in the policy.
 //
 //	requests.WithRedirectPolicy(DomainCheckRedirectPolicy("host1.com", "host2.org", "host3.net"))
@@ -87,7 +87,7 @@ func getHostname(host string) (hostname string) {
 // By default Golang will not redirect request headers
 // after go throughing various discussion comments from thread
 // https://github.com/golang/go/issues/4800
-// Resty will add all the headers during a redirect for the same host
+//  will add all the headers during a redirect for the same host
 func checkHostAndAddHeaders(request *http.Request, response *http.Request) {
 	requestHostname := getHostname(request.URL.Host)
 	responseHostname := getHostname(response.URL.Host)
@@ -111,7 +111,7 @@ func (c *Client) WithRedirectLimit(redirectLimit int) *Client {
 	return c
 }
 
-// WithRedirectPolicy method sets the client redirect poilicy. Resty provides ready to use
+// WithRedirectPolicy method sets the client redirect poilicy.  provides ready to use
 // redirect policies. Wanna create one for yourself refer to `redirect.go`.
 //	WithRedirectLimit(20)
 //	WithRedirectPolicy(FlexibleRedirectPolicy(20))
@@ -130,7 +130,7 @@ func (c *Client) WithRedirectPolicy(policies ...any) *Client {
 					return err
 				}
 			} else {
-				c.Logger.Fatalf("%v does not implement resty.RedirectPolicy (missing Apply method)", functionName(p))
+				c.Logger.Fatalf("%v does not implement .RedirectPolicy (missing Apply method)", functionName(p))
 			}
 		}
 		// looks good, go ahead
