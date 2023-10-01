@@ -2,12 +2,34 @@ package requests
 
 import (
 	"context"
+	"encoding/json"
+	_testdata "github.com/pkg6/go-requests/.testdata"
 	"net/http"
 	"net/url"
 	"testing"
 )
 
 var defaultRequest = New()
+
+func TestClientRequestD(t *testing.T) {
+	var resp _testdata.GitHubUser
+	_ = defaultRequest.DoRequestD(context.Background(),
+		http.MethodGet,
+		"https://api.github.com/users/github", nil, &resp)
+	if resp.Id != 9919 {
+		t.Fatalf("get error")
+	}
+}
+func TestClientRequestBytes(t *testing.T) {
+	var resp _testdata.GitHubUser
+	b, _ := defaultRequest.DoRequestBytes(context.Background(),
+		http.MethodGet,
+		"https://api.github.com/users/github", nil)
+	json.Unmarshal(b, &resp)
+	if resp.Id != 9919 {
+		t.Fatalf("get error")
+	}
+}
 
 func TestClient_Get(t *testing.T) {
 	data := url.Values{}
