@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const requestLogCtxKey = "request_log_star_time"
+const ctxDebugStartTime = "requestDebugStartTime"
 
 func requestLogger(client *Client, request *http.Request) error {
 	if client.Debug {
@@ -18,7 +18,7 @@ func requestLogger(client *Client, request *http.Request) error {
 			body, _ = io.ReadAll(request.Body)
 			request.Body = NewReadCloser(body, false)
 		}
-		client.Context = context.WithValue(context.Background(), requestLogCtxKey, now)
+		client.ctx = context.WithValue(context.Background(), ctxDebugStartTime, now)
 		headers, _ := client.jsonMarshal(request.Header)
 		reqLog := "\n==============================================================================\n" +
 			"~~~ REQUEST ~~~\n" +
@@ -41,7 +41,7 @@ func responseLogger(client *Client, request *http.Request, response *Response) e
 			response.requestBody = reqBodyContent
 			response.Body = NewReadCloser(reqBodyContent, false)
 		}
-		s := client.Context.Value(requestLogCtxKey).(time.Time)
+		s := client.ctx.Value(ctxDebugStartTime).(time.Time)
 		headers, _ := client.jsonMarshal(response.Header)
 		debugLog := "~~~ RESPONSE ~~~\n" +
 			fmt.Sprintf("CLONE        : %v\n", client.clone) +

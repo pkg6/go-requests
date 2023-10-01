@@ -6,7 +6,7 @@
 
 ## 基本介绍
 
-`GoRequests`框架提供了强大便捷易用的HTTP客户端，基于`http.Client`进行扩展开发，对象创建可以通过`requests.New()`包方法，也可以通过`new(requests.Client).Clone()`方法调用，同时你还可以使用`requests.NewHttpClient(requests.DefaultHttpClient(nil))`创建对象。推荐使用`new(requests.Client).Clone()`来便捷地创建HTTP客户端对象。
+`GoRequests`框架提供了强大便捷易用的HTTP客户端，基于`http.Client`进行扩展开发，对象创建可以通过`requests.New()`包方法，也可以通过`new(requests.Client).Clone()`方法调用，同时你还可以使用`requests.NewHttpClient(requests.DefaultHttpClient(nil))`创建对象。推荐使用`requests.New()`来便捷地创建HTTP客户端对象。
 
 ## 安装
 
@@ -103,6 +103,7 @@ func main() {
 (r *Response) TraceInfo() TraceInfo
 (r *Response) ReadAll() []byte
 (r *Response) ReadAllString() string
+(r *Response) ReadStream(lineNumberFun func(line []byte, number int64)) int64
 (r *Response) GetCookieMap() map[string]string
 (r *Response) GetCookie(key string) string
 (r *Response) ContentType() string
