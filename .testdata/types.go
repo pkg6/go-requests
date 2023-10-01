@@ -3,6 +3,7 @@ package _testdata
 import "time"
 
 //https://api.github.com/users/github
+
 type GitHubUser struct {
 	Login             string      `json:"login"`
 	Id                int         `json:"id"`
