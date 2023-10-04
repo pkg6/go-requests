@@ -35,10 +35,10 @@ func TestSetGet(t *testing.T) {
 func BenchmarkGet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		key := fmt.Sprintf("key%d", i)
-		_newCache.Set(key, strings.Repeat("a", 100), 0)
+		_ = _newCache.Set(key, strings.Repeat("a", 100), 0)
 	}
 	for i := 0; i < b.N; i++ {
 		key := fmt.Sprintf("key%d", i)
-		_newCache.Get(key)
+		_, _ = _newCache.Get(key)
 	}
 }

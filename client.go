@@ -66,7 +66,7 @@ type Client struct {
 	BaseUrl       string
 	Query         url.Values
 	Header        http.Header
-	Cookie        CookieRaw
+	Cookie        Cookie
 	Logger        Logger
 	JSONMarshal   func(v any) ([]byte, error)
 	JSONUnmarshal func(data []byte, v any) error
@@ -138,7 +138,7 @@ func (c *Client) Clone() *Client {
 	c.Query = nil
 	c.BaseUrl = ""
 	c.Header = make(http.Header, 0)
-	c.Cookie = make(CookieRaw, 0)
+	c.Cookie = make(Cookie, 0)
 	c.retryWaitTime = defaultWaitTime
 	c.retryCount = defaultRetryCount
 	c.beforeRequestCallbacks = make([]ClientCallback, 0)
