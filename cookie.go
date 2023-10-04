@@ -11,7 +11,7 @@ func OnAfterRequestWithCookie(cache ICache) RequestCallback {
 		cacheKey := Md5(request.URL.Host)
 		if cache.Has(cacheKey) {
 			if cookStr, _ := cache.Get(cacheKey); cookStr != "" {
-				var cookieRaw CookieRaw
+				var cookieRaw Cookie
 				_ = client.JSONUnmarshal([]byte(cookStr), &cookieRaw)
 				request.Header.Set(HttpHeaderCookie, cookieRaw.Encode())
 			}
@@ -34,8 +34,8 @@ func OnResponseWithCookie(cache ICache, ttl time.Duration) ResponseCallback {
 	}
 }
 
-func CookieToRaw(cookie string) CookieRaw {
-	cookieRaw := make(CookieRaw)
+func CookieStringEscape(cookie string) Cookie {
+	cookieRaw := make(Cookie)
 	if cookie == "" {
 		return cookieRaw
 	}
@@ -48,9 +48,9 @@ func CookieToRaw(cookie string) CookieRaw {
 	return cookieRaw
 }
 
-type CookieRaw map[string][]string
+type Cookie map[string][]string
 
-func (v CookieRaw) Get(key string) string {
+func (v Cookie) Get(key string) string {
 	if v == nil {
 		return ""
 	}
@@ -60,20 +60,20 @@ func (v CookieRaw) Get(key string) string {
 	}
 	return vs[0]
 }
-func (v CookieRaw) Set(key, value string) {
+func (v Cookie) Set(key, value string) {
 	v[key] = []string{value}
 }
-func (v CookieRaw) Add(key, value string) {
+func (v Cookie) Add(key, value string) {
 	v[key] = append(v[key], value)
 }
-func (v CookieRaw) Del(key string) {
+func (v Cookie) Del(key string) {
 	delete(v, key)
 }
-func (v CookieRaw) Has(key string) bool {
+func (v Cookie) Has(key string) bool {
 	_, ok := v[key]
 	return ok
 }
-func (v CookieRaw) Encode() string {
+func (v Cookie) Encode() string {
 	cookieStr := ""
 	for s := range v {
 		if cookieStr != "" {

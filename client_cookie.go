@@ -10,24 +10,31 @@ import (
 // When browser mode is enabled, it automatically saves and sends cookie content
 // from and to server.
 func (c *Client) BrowserMode() *Client {
-	c.Jar, _ = cookiejar.New(nil)
-	return c
+	jar, _ := cookiejar.New(nil)
+	return c.WithCookieJar(jar)
 }
 func (c *Client) WithCookieJar(jar http.CookieJar) *Client {
 	c.Client.Jar = jar
 	return c
 }
+func (c *Client) WithCookieString(cookieString string) *Client {
+	c.WithCookies(CookieStringEscape(cookieString))
+	return c
+}
+
 func (c *Client) WithCookie(k, v string) *Client {
 	c.Cookie.Set(k, v)
 	return c
 }
-func (c *Client) WithCookies(cookies map[string]string) *Client {
+
+func (c *Client) WithCookieMap(cookies map[string]string) *Client {
 	for k, v := range cookies {
 		c.WithCookie(k, v)
 	}
 	return c
 }
-func (c *Client) WithCookieRaw(cookie CookieRaw) *Client {
+
+func (c *Client) WithCookies(cookie Cookie) *Client {
 	c.Cookie = cookie
 	return c
 }
