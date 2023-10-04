@@ -9,7 +9,11 @@ import (
 	"time"
 )
 
-const ctxDebugStartTime = "requestDebugStartTime"
+type ctxKey string
+
+const (
+	ctxDebugStartTime ctxKey = "_request_debug_logger_start_time"
+)
 
 func requestLogger(client *Client, request *http.Request) error {
 	if client.Debug {
@@ -82,7 +86,8 @@ func writerRequestResponseLog(client *Client, request *http.Request, response *R
 			response.Body = NewReadCloser(responseBody, false)
 		}
 		builder.Write(responseBody)
-		fmt.Fprintf(client.writer, builder.String())
+		_, err := fmt.Fprintln(client.writer, builder.String())
+		return err
 	}
 	return nil
 }

@@ -24,7 +24,7 @@ func WithCookie(k, v string) ArgsFunc {
 }
 func WithCookies(cookies map[string]string) ArgsFunc {
 	return func(client *Client) {
-		client.WithCookies(cookies)
+		client.WithCookieMap(cookies)
 	}
 }
 
