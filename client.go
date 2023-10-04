@@ -8,7 +8,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"golang.org/x/net/proxy"
-	"log"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -46,37 +46,40 @@ const (
 var (
 	hdrUserAgentKey    = http.CanonicalHeaderKey(HttpHeaderUserAgent)
 	hostname, _        = os.Hostname()
-	defaultClientAgent = fmt.Sprintf(`github.com/pkg6/go-requests  at  %s`, hostname)
+	defaultClientAgent = fmt.Sprintf(`github.com/pkg6/go-requests at  %s`, hostname)
 	defaultRetryCount  = 3
 	defaultWaitTime    = time.Duration(2000) * time.Millisecond
 )
 
 type (
-	clientCallback   func(client *Client) error
-	requestCallback  func(client *Client, request *http.Request) error
-	responseCallback func(client *Client, request *http.Request, response *Response) error
+	ClientCallback   func(client *Client) error
+	RequestCallback  func(client *Client, request *http.Request) error
+	ResponseCallback func(client *Client, request *http.Request, response *Response) error
 	ErrorHook        func(client *Client, request *http.Request, err error)
 	SuccessHook      func(client *Client, response *Response)
 )
 
 type Client struct {
 	*http.Client
-	BaseUrl string
-	Debug   bool
-	Query   url.Values
+	Debug bool
 
+	BaseUrl       string
+	Query         url.Values
 	Header        http.Header
-	Cookie        Cookie
-	Logger        *log.Logger
+	Cookie        CookieRaw
+	Logger        Logger
 	JSONMarshal   func(v any) ([]byte, error)
 	JSONUnmarshal func(data []byte, v any) error
 	XMLMarshal    func(v any) ([]byte, error)
 	XMLUnmarshal  func(data []byte, v any) error
 
+	//os.Stderr
+	writer io.Writer
+
 	middlewares            []MiddlewareFunc
-	beforeRequestCallbacks []clientCallback
-	afterRequestCallbacks  []requestCallback
-	responseCallbacks      []responseCallback
+	beforeRequestCallbacks []ClientCallback
+	afterRequestCallbacks  []RequestCallback
+	responseCallbacks      []ResponseCallback
 	successHooks           []SuccessHook
 	errorHooks             []ErrorHook
 	panicHooks             []ErrorHook
@@ -135,12 +138,12 @@ func (c *Client) Clone() *Client {
 	c.Query = nil
 	c.BaseUrl = ""
 	c.Header = make(http.Header, 0)
-	c.Cookie = make(Cookie, 0)
+	c.Cookie = make(CookieRaw, 0)
 	c.retryWaitTime = defaultWaitTime
 	c.retryCount = defaultRetryCount
-	c.beforeRequestCallbacks = make([]clientCallback, 0)
-	c.afterRequestCallbacks = make([]requestCallback, 0)
-	c.responseCallbacks = make([]responseCallback, 0)
+	c.beforeRequestCallbacks = make([]ClientCallback, 0)
+	c.afterRequestCallbacks = make([]RequestCallback, 0)
+	c.responseCallbacks = make([]ResponseCallback, 0)
 	c.successHooks = make([]SuccessHook, 0)
 	c.errorHooks = make([]ErrorHook, 0)
 	if c.JSONMarshal == nil {
@@ -156,13 +159,18 @@ func (c *Client) Clone() *Client {
 		c.SetXMLUnmarshaler(xml.Unmarshal)
 	}
 	if c.Logger == nil {
-		c.Logger = log.Default()
+		c.Logger = DefaultLogger()
 	}
 	if c.Header.Get(HttpHeaderUserAgent) == "" {
 		c.WithUserAgent(defaultClientAgent)
 	}
+	if c.ctx == nil {
+		c.ctx = context.Background()
+	}
+	c.writer = nil
 	c.OnAfterRequest(requestLogger)
 	c.OnResponse(responseLogger)
+	c.OnResponse(writerRequestResponseLog)
 	c.attempt = 1
 	c.clone += 1
 	return c
@@ -170,6 +178,14 @@ func (c *Client) Clone() *Client {
 
 func (c *Client) WitchHttpClient(client *http.Client) *Client {
 	c.Client = client
+	return c
+}
+func (c *Client) SetDebug(debug bool) *Client {
+	c.Debug = debug
+	return c
+}
+func (c *Client) SetWriter(writer io.Writer) *Client {
+	c.writer = writer
 	return c
 }
 
@@ -180,11 +196,6 @@ func (c *Client) SetBaseURL(baseUrl string) *Client {
 
 func (c *Client) SetQuery(query url.Values) *Client {
 	c.Query = query
-	return c
-}
-
-func (c *Client) SetDebug(debug bool) *Client {
-	c.Debug = debug
 	return c
 }
 
@@ -238,7 +249,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 	}
 	_proxy, err := url.Parse(proxyURL)
 	if err != nil {
-		c.Logger.Fatalf(`%+v`, err)
+		c.Logger.Errorf(`%+v`, err)
 		return c
 	}
 	if _proxy.Scheme == httpSchemeName {
@@ -263,7 +274,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 			KeepAlive: c.Client.Timeout,
 		})
 		if err != nil {
-			c.Logger.Fatalf(`%+v`, err)
+			c.Logger.Errorf(`%+v`, err)
 			return c
 		}
 		if v, ok := c.Transport.(*http.Transport); ok {
@@ -279,7 +290,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) *Client {
 	crt, err := tls.LoadX509KeyPair(crtFile, keyFile)
 	if err != nil {
-		c.Logger.Fatalf("LoadKeyCrt failed")
+		c.Logger.Errorf("LoadKeyCrt failed")
 		return c
 	}
 	tlsConfig := &tls.Config{}
@@ -295,7 +306,8 @@ func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) *Client {
 func (c *Client) SetTLSConfig(tlsConfig *tls.Config) *Client {
 	v, ok := c.Transport.(*http.Transport)
 	if !ok {
-		c.Logger.Fatalf(`cannot set TLSClientConfig for custom Transport of the client`)
+		c.Logger.Errorf(`cannot set TLSClientConfig for custom Transport of the client`)
+		return c
 	}
 	v.TLSClientConfig = tlsConfig
 	return c

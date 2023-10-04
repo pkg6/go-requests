@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -17,11 +16,8 @@ func (c *Client) DoRequestD(ctx context.Context, method string, uri string, data
 	if err != nil {
 		return nil
 	}
-	defer response.Close()
 	defer func() {
-		if err = response.Close(); err != nil {
-			c.Logger.Fatalf("%v", err)
-		}
+		_ = response.Close()
 	}()
 	return response.Unmarshal(d)
 }
@@ -32,9 +28,7 @@ func (c *Client) DoRequestBytes(ctx context.Context, method string, uri string, 
 		return nil, err
 	}
 	defer func() {
-		if err = response.Close(); err != nil {
-			c.Logger.Fatalf("%v", err)
-		}
+		_ = response.Close()
 	}()
 	return response.ReadAll(), nil
 }
@@ -85,21 +79,15 @@ func (c *Client) DoRequest(ctx context.Context, method, uri string, body any) (r
 		c.doErrorHooks(request, response, err)
 		return nil, err
 	}
-	if err = c.doResponseCallbacks(request, response); err != nil {
+	err = c.doResponseCallbacks(request, response)
+	if err != nil {
 		c.doErrorHooks(request, response, err)
 		return nil, err
 	}
-	c.doErrorHooks(request, response, err)
 	return response, err
 }
 func (c *Client) callRequest(request *http.Request) (response *Response, err error) {
 	response = &Response{request: request, client: c}
-	reqBodyContent, err := io.ReadAll(request.Body)
-	if err != nil {
-		return response, fmt.Errorf(`io.ReadAll: %v`, err)
-	}
-	response.requestBody = reqBodyContent
-	request.Body = NewReadCloser(reqBodyContent, false)
 	for {
 		if response.Response, err = c.Do(request); err != nil {
 			c.attempt++

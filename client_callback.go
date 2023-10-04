@@ -10,7 +10,7 @@ import (
 //			// manipulate it as per your need
 //			return nil 	// if its success otherwise return error
 //		})
-func (c *Client) OnBeforeRequest(callback clientCallback) *Client {
+func (c *Client) OnBeforeRequest(callback ClientCallback) *Client {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.beforeRequestCallbacks = append(c.beforeRequestCallbacks, callback)
@@ -24,7 +24,7 @@ func (c *Client) OnBeforeRequest(callback clientCallback) *Client {
 //
 //			return nil 	// if its success otherwise return error
 //		})
-func (c *Client) OnAfterRequest(callback requestCallback) *Client {
+func (c *Client) OnAfterRequest(callback RequestCallback) *Client {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.afterRequestCallbacks = append(c.afterRequestCallbacks, callback)
@@ -38,7 +38,7 @@ func (c *Client) OnAfterRequest(callback requestCallback) *Client {
 //
 //			return nil 	// if its success otherwise return error
 //		})
-func (c *Client) OnResponse(callback responseCallback) *Client {
+func (c *Client) OnResponse(callback ResponseCallback) *Client {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.responseCallbacks = append(c.responseCallbacks, callback)
