@@ -110,7 +110,7 @@ func TestUri(t *testing.T) {
 	}
 }
 
-func TestToString(t *testing.T) {
+func TestAnyString(t *testing.T) {
 	type args struct {
 		any any
 	}
@@ -132,7 +132,7 @@ func TestToString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ToString(tt.args.any); got != tt.want {
+			if got := AnyString(tt.args.any); got != tt.want {
 				t.Errorf("ToString() = %v, want %v", got, tt.want)
 			}
 		})
