@@ -128,8 +128,6 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 			uv.Set(s, s2)
 		}
 		return uv.Encode()
-	case map[string]any:
-		return HttpBuildQuery(val)
 	}
 	if method == http.MethodGet && body != nil {
 		if jsonByte, err := c.JSONMarshal(body); err == nil {
@@ -139,7 +137,7 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 			}
 		}
 	}
-	return ToString(body)
+	return AnyString(body)
 }
 func (c *Client) prepareBody(method string, body any) (string, error) {
 	var params string
@@ -148,7 +146,7 @@ func (c *Client) prepareBody(method string, body any) (string, error) {
 		if IsJSONType(contentType) {
 			switch body.(type) {
 			case string, []byte:
-				params = ToString(body)
+				params = AnyString(body)
 			default:
 				if b, err := c.JSONMarshal(body); err != nil {
 					return "", err
@@ -159,7 +157,7 @@ func (c *Client) prepareBody(method string, body any) (string, error) {
 		} else if IsXMLType(contentType) {
 			switch body.(type) {
 			case string, []byte:
-				params = ToString(body)
+				params = AnyString(body)
 			default:
 				if b, err := c.XMLMarshal(body); err != nil {
 					return "", err
