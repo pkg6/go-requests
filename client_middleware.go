@@ -2,7 +2,9 @@ package requests
 
 import "net/http"
 
-const clientMiddlewareKey = "__clientMiddlewareKey"
+const (
+	clientMiddlewareKey ctxKey = "__client_middleware_key"
+)
 
 // MiddlewareFunc middleware handler func
 type MiddlewareFunc = func(c *Client, r *http.Request) (*Response, error)

@@ -25,7 +25,7 @@ func TestClientRequestBytes(t *testing.T) {
 	b, _ := defaultRequest.DoRequestBytes(context.Background(),
 		http.MethodGet,
 		"https://api.github.com/users/github", nil)
-	json.Unmarshal(b, &resp)
+	_ = json.Unmarshal(b, &resp)
 	if resp.Id != 9919 {
 		t.Fatalf("get error")
 	}

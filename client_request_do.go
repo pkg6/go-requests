@@ -40,12 +40,10 @@ func (c *Client) DoRequest(ctx context.Context, method, uri string, body any) (r
 	request, err := c.prepareRequest(ctx, method, uri, body)
 	defer func() {
 		if rec := recover(); rec != nil {
-			if err, ok := rec.(error); ok {
-				c.doPanicHooks(request, err)
-			} else {
-				c.doPanicHooks(request, fmt.Errorf("panic %v", rec))
+			if panicErr, ok := rec.(error); ok {
+				c.doPanicHooks(request, panicErr)
+				panic(panicErr)
 			}
-			panic(rec)
 		}
 	}()
 	if err != nil {
@@ -130,8 +128,6 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 			uv.Set(s, s2)
 		}
 		return uv.Encode()
-	case map[string]any:
-		return HttpBuildQuery(val)
 	}
 	if method == http.MethodGet && body != nil {
 		if jsonByte, err := c.JSONMarshal(body); err == nil {
@@ -141,7 +137,7 @@ func (c *Client) prepareBodyDefault(method string, body any) string {
 			}
 		}
 	}
-	return ToString(body)
+	return AnyString(body)
 }
 func (c *Client) prepareBody(method string, body any) (string, error) {
 	var params string
@@ -150,7 +146,7 @@ func (c *Client) prepareBody(method string, body any) (string, error) {
 		if IsJSONType(contentType) {
 			switch body.(type) {
 			case string, []byte:
-				params = ToString(body)
+				params = AnyString(body)
 			default:
 				if b, err := c.JSONMarshal(body); err != nil {
 					return "", err
@@ -161,7 +157,7 @@ func (c *Client) prepareBody(method string, body any) (string, error) {
 		} else if IsXMLType(contentType) {
 			switch body.(type) {
 			case string, []byte:
-				params = ToString(body)
+				params = AnyString(body)
 			default:
 				if b, err := c.XMLMarshal(body); err != nil {
 					return "", err
@@ -230,11 +226,11 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 			}
 		}
 	}
-	//重新加载上下文
+	//Load Context
 	if withContext := c.withContext(ctx); withContext != nil {
 		request = request.WithContext(withContext)
 	}
-	//加载cookie
+	//Load cookies
 	if len(c.Cookie) > 0 {
 		c.Header.Set(HttpHeaderCookie, c.Cookie.Encode())
 	}
