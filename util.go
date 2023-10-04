@@ -13,9 +13,9 @@ import (
 	"time"
 )
 
-// ToString converts `any` to string.
+// AnyString converts `any` to string.
 // It's most commonly used converting function.
-func ToString(any any) string {
+func AnyString(any any) string {
 	if any == nil {
 		return ""
 	}
@@ -92,7 +92,7 @@ func ToString(any any) string {
 			return rv.String()
 		}
 		if kind == reflect.Ptr {
-			return ToString(rv.Elem().Interface())
+			return AnyString(rv.Elem().Interface())
 		}
 		// Finally, we use json.Marshal to convert.
 		if jsonContent, err := json.Marshal(value); err != nil {
@@ -174,14 +174,4 @@ func buildQuery(buf *bytes.Buffer, key string, val any) {
 	default:
 		buf.WriteString(url.QueryEscape(fmt.Sprint(v)))
 	}
-}
-
-func MapCookiesToString(cookies map[string]string, cookieStr string) string {
-	for k, v := range cookies {
-		if len(cookieStr) > 0 {
-			cookieStr += ";"
-		}
-		cookieStr += k + "=" + v
-	}
-	return cookieStr
 }
