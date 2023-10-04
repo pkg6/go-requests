@@ -49,8 +49,8 @@ func (r *Response) TraceInfo() TraceInfo {
 	return ti
 }
 
-func (r *Response) GetCookieMap() CookieRaw {
-	raw := make(CookieRaw)
+func (r *Response) GetCookieMap() Cookie {
+	raw := make(Cookie)
 	for _, c := range r.Cookies() {
 		raw.Set(c.Name, c.Value)
 	}

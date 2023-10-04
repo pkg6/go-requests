@@ -62,7 +62,7 @@ func RequestRoute(route IRoute) error {
 	client := new(Client).Clone().WitchHttpClient(DefaultHttpClient(nil))
 	client.WithHeaders(route.GetHeader())
 	client.SetTLSConfig(route.GetTlsConfig())
-	client.WithCookies(route.GetCookies())
+	client.WithCookieMap(route.GetCookies())
 	request, err := client.DoRequest(context.Background(), route.GetMethod(), route.GetUri(), route.GetBody())
 	if err != nil {
 		return err
