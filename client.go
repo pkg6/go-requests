@@ -52,9 +52,9 @@ var (
 )
 
 type (
-	clientCallback   func(client *Client) error
-	requestCallback  func(client *Client, request *http.Request) error
-	responseCallback func(client *Client, request *http.Request, response *Response) error
+	ClientCallback   func(client *Client) error
+	RequestCallback  func(client *Client, request *http.Request) error
+	ResponseCallback func(client *Client, request *http.Request, response *Response) error
 	ErrorHook        func(client *Client, request *http.Request, err error)
 	SuccessHook      func(client *Client, response *Response)
 )
@@ -63,12 +63,11 @@ type Client struct {
 	*http.Client
 	Debug bool
 
-	BaseUrl string
-	Query   url.Values
-	Header  http.Header
-	Cookie  Cookie
-	Logger  Logger
-
+	BaseUrl       string
+	Query         url.Values
+	Header        http.Header
+	Cookie        CookieRaw
+	Logger        Logger
 	JSONMarshal   func(v any) ([]byte, error)
 	JSONUnmarshal func(data []byte, v any) error
 	XMLMarshal    func(v any) ([]byte, error)
@@ -78,9 +77,9 @@ type Client struct {
 	writer io.Writer
 
 	middlewares            []MiddlewareFunc
-	beforeRequestCallbacks []clientCallback
-	afterRequestCallbacks  []requestCallback
-	responseCallbacks      []responseCallback
+	beforeRequestCallbacks []ClientCallback
+	afterRequestCallbacks  []RequestCallback
+	responseCallbacks      []ResponseCallback
 	successHooks           []SuccessHook
 	errorHooks             []ErrorHook
 	panicHooks             []ErrorHook
@@ -139,12 +138,12 @@ func (c *Client) Clone() *Client {
 	c.Query = nil
 	c.BaseUrl = ""
 	c.Header = make(http.Header, 0)
-	c.Cookie = make(Cookie, 0)
+	c.Cookie = make(CookieRaw, 0)
 	c.retryWaitTime = defaultWaitTime
 	c.retryCount = defaultRetryCount
-	c.beforeRequestCallbacks = make([]clientCallback, 0)
-	c.afterRequestCallbacks = make([]requestCallback, 0)
-	c.responseCallbacks = make([]responseCallback, 0)
+	c.beforeRequestCallbacks = make([]ClientCallback, 0)
+	c.afterRequestCallbacks = make([]RequestCallback, 0)
+	c.responseCallbacks = make([]ResponseCallback, 0)
 	c.successHooks = make([]SuccessHook, 0)
 	c.errorHooks = make([]ErrorHook, 0)
 	if c.JSONMarshal == nil {

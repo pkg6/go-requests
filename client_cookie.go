@@ -3,6 +3,7 @@ package requests
 import (
 	"net/http"
 	"net/http/cookiejar"
+	"time"
 )
 
 // BrowserMode enables browser mode of the client.
@@ -24,5 +25,21 @@ func (c *Client) WithCookies(cookies map[string]string) *Client {
 	for k, v := range cookies {
 		c.WithCookie(k, v)
 	}
+	return c
+}
+func (c *Client) WithCookieRaw(cookie CookieRaw) *Client {
+	c.Cookie = cookie
+	return c
+}
+
+// WithCookieNextRequest
+//  The first access to the root domain name will cache cookie data, and the second access will carry the cookie data from the cache until the cache expires and is regenerated
+//	cache := requests.NewFileCache("you path/cache")
+//	WithCookieNextRequest(cache, time.Hour)
+func (c *Client) WithCookieNextRequest(cache ICache, ttl time.Duration) *Client {
+	//set cookie
+	c.OnResponse(OnResponseWithCookie(cache, ttl))
+	// get cookie
+	c.OnAfterRequest(OnAfterRequestWithCookie(cache))
 	return c
 }

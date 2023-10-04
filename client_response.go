@@ -10,7 +10,6 @@ type Response struct {
 	*http.Response               // Response is the underlying http.Response object of certain request.
 	request        *http.Request // Request is the underlying http.Request object of certain request.
 	client         *Client
-	cookies        map[string]string
 }
 
 func (r *Response) TraceInfo() TraceInfo {
@@ -50,22 +49,16 @@ func (r *Response) TraceInfo() TraceInfo {
 	return ti
 }
 
-func (r *Response) GetCookieMap() map[string]string {
-	if r.cookies == nil {
-		r.cookies = make(map[string]string)
-		for _, c := range r.Cookies() {
-			r.cookies[c.Name] = c.Value
-		}
+func (r *Response) GetCookieMap() CookieRaw {
+	raw := make(CookieRaw)
+	for _, c := range r.Cookies() {
+		raw.Set(c.Name, c.Value)
 	}
-	return r.cookies
+	return raw
 }
 
 func (r *Response) GetCookie(key string) string {
-	r.GetCookieMap()
-	if cookie, ok := r.cookies[key]; ok {
-		return cookie
-	}
-	return ""
+	return r.GetCookieMap().Get(key)
 }
 
 // ReadAll retrieves and returns the response content as []byte.
