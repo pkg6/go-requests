@@ -8,7 +8,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"golang.org/x/net/proxy"
-	"log"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -46,7 +46,7 @@ const (
 var (
 	hdrUserAgentKey    = http.CanonicalHeaderKey(HttpHeaderUserAgent)
 	hostname, _        = os.Hostname()
-	defaultClientAgent = fmt.Sprintf(`github.com/pkg6/go-requests  at  %s`, hostname)
+	defaultClientAgent = fmt.Sprintf(`github.com/pkg6/go-requests at  %s`, hostname)
 	defaultRetryCount  = 3
 	defaultWaitTime    = time.Duration(2000) * time.Millisecond
 )
@@ -61,17 +61,21 @@ type (
 
 type Client struct {
 	*http.Client
-	BaseUrl string
-	Debug   bool
-	Query   url.Values
+	Debug bool
 
-	Header        http.Header
-	Cookie        Cookie
-	Logger        *log.Logger
+	BaseUrl string
+	Query   url.Values
+	Header  http.Header
+	Cookie  Cookie
+	Logger  Logger
+
 	JSONMarshal   func(v any) ([]byte, error)
 	JSONUnmarshal func(data []byte, v any) error
 	XMLMarshal    func(v any) ([]byte, error)
 	XMLUnmarshal  func(data []byte, v any) error
+
+	//os.Stderr
+	writer io.Writer
 
 	middlewares            []MiddlewareFunc
 	beforeRequestCallbacks []clientCallback
@@ -156,13 +160,18 @@ func (c *Client) Clone() *Client {
 		c.SetXMLUnmarshaler(xml.Unmarshal)
 	}
 	if c.Logger == nil {
-		c.Logger = log.Default()
+		c.Logger = DefaultLogger()
 	}
 	if c.Header.Get(HttpHeaderUserAgent) == "" {
 		c.WithUserAgent(defaultClientAgent)
 	}
+	if c.ctx == nil {
+		c.ctx = context.Background()
+	}
+	c.writer = nil
 	c.OnAfterRequest(requestLogger)
 	c.OnResponse(responseLogger)
+	c.OnResponse(writerRequestResponseLog)
 	c.attempt = 1
 	c.clone += 1
 	return c
@@ -170,6 +179,14 @@ func (c *Client) Clone() *Client {
 
 func (c *Client) WitchHttpClient(client *http.Client) *Client {
 	c.Client = client
+	return c
+}
+func (c *Client) SetDebug(debug bool) *Client {
+	c.Debug = debug
+	return c
+}
+func (c *Client) SetWriter(writer io.Writer) *Client {
+	c.writer = writer
 	return c
 }
 
@@ -180,11 +197,6 @@ func (c *Client) SetBaseURL(baseUrl string) *Client {
 
 func (c *Client) SetQuery(query url.Values) *Client {
 	c.Query = query
-	return c
-}
-
-func (c *Client) SetDebug(debug bool) *Client {
-	c.Debug = debug
 	return c
 }
 
@@ -238,7 +250,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 	}
 	_proxy, err := url.Parse(proxyURL)
 	if err != nil {
-		c.Logger.Fatalf(`%+v`, err)
+		c.Logger.Errorf(`%+v`, err)
 		return c
 	}
 	if _proxy.Scheme == httpSchemeName {
@@ -263,7 +275,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 			KeepAlive: c.Client.Timeout,
 		})
 		if err != nil {
-			c.Logger.Fatalf(`%+v`, err)
+			c.Logger.Errorf(`%+v`, err)
 			return c
 		}
 		if v, ok := c.Transport.(*http.Transport); ok {
@@ -279,7 +291,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) *Client {
 	crt, err := tls.LoadX509KeyPair(crtFile, keyFile)
 	if err != nil {
-		c.Logger.Fatalf("LoadKeyCrt failed")
+		c.Logger.Errorf("LoadKeyCrt failed")
 		return c
 	}
 	tlsConfig := &tls.Config{}
@@ -295,7 +307,8 @@ func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) *Client {
 func (c *Client) SetTLSConfig(tlsConfig *tls.Config) *Client {
 	v, ok := c.Transport.(*http.Transport)
 	if !ok {
-		c.Logger.Fatalf(`cannot set TLSClientConfig for custom Transport of the client`)
+		c.Logger.Errorf(`cannot set TLSClientConfig for custom Transport of the client`)
+		return c
 	}
 	v.TLSClientConfig = tlsConfig
 	return c
