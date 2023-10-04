@@ -52,6 +52,15 @@ func (c *Client) WithUserAgent(userAgent string) *Client {
 	return c
 }
 
+func (c *Client) WithRandomUserAgent() *Client {
+	c.WithUserAgent(RandomUserAgent())
+	return c
+}
+func (c *Client) WithRandomMobileUserAgent() *Client {
+	c.WithUserAgent(RandomMobileUserAgent())
+	return c
+}
+
 // AsForm is a chaining function,
 // which sets the HTTP content type as "application/x-www-form-urlencoded" for the next request.
 func (c *Client) AsForm() *Client {

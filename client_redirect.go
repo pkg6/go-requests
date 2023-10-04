@@ -42,8 +42,6 @@ func NoRedirectPolicy() RedirectPolicy {
 }
 
 // FlexibleRedirectPolicy is convenient method to create No of redirect policy for HTTP client.
-//
-//	requests.SetRedirectPolicy(FlexibleRedirectPolicy(20))
 func FlexibleRedirectPolicy(noOfRedirect int) RedirectPolicy {
 	return RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error {
 		if len(via) >= noOfRedirect {
@@ -130,10 +128,9 @@ func (c *Client) WithRedirectPolicy(policies ...any) *Client {
 					return err
 				}
 			} else {
-				c.Logger.Fatalf("%v does not implement .RedirectPolicy (missing Apply method)", functionName(p))
+				c.Logger.Warnf("%v does not implement .RedirectPolicy (missing Apply method)", functionName(p))
 			}
 		}
-		// looks good, go ahead
 		return nil
 	})
 	return c
