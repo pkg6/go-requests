@@ -3,7 +3,7 @@ package requests
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
+	"io"
 	"net/url"
 	"os"
 )
@@ -260,35 +260,33 @@ func RequestUnmarshal(method, uri string, data, d any, args ...ArgsFunc) error {
 	return client.DoRequestD(context.Background(), method, uri, data, d)
 }
 
+// RequestUnmarshalSaveFile
+//	var resp _testdata.GitHubUser
+//	err := requests.RequestUnmarshalSaveFile(http.MethodGet,
+//		"https://api.github.com/users/github",
+//		nil, &resp, "github_user.log")
+//	fmt.Println(err)
+//	fmt.Println(resp)
 func RequestUnmarshalSaveFile(method, uri string, data, d any, fileName string, args ...ArgsFunc) error {
 	client := new(Client).Clone()
 	for _, arg := range args {
 		arg(client)
 	}
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	client.SetWriter(file)
 	resp, err := client.DoRequest(context.Background(), method, uri, data)
 	if err != nil {
 		return err
 	}
-	body := resp.ReadAll()
-	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-	if err != nil {
-		return err
-	}
-	if _, err = file.Write(body); err != nil {
-		return err
-	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	body, _ := io.ReadAll(resp.Body)
 	if err = client.Unmarshal(resp.ContentType(), body, d); err != nil {
 		return err
-	}
-	if client.Debug {
-		reqLog := "\n==============================================================================\n" +
-			"~~~ RequestUnmarshalSaveFile ~~~\n" +
-			fmt.Sprintf("%s %s \n", method, uri) +
-			fmt.Sprintf("FileName: %s\n", fileName) +
-			fmt.Sprintf("BODY: %v\n", string(body)) +
-			fmt.Sprintf("d: %#v\n", d) +
-			"------------------------------------------------------------------------------\n"
-		client.Logger.Println(reqLog)
 	}
 	return nil
 }

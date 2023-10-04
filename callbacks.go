@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -26,20 +27,19 @@ func requestLogger(client *Client, request *http.Request) error {
 			fmt.Sprintf("HOST           : %s\n", request.URL.Host) +
 			fmt.Sprintf("TIME DURATION  : %v\n", now.Format(time.RFC3339Nano)) +
 			fmt.Sprintf("HEADERS        : \n%s\n", string(headers)) +
-			fmt.Sprintf("BODY           :\n%v\n", string(body)) +
+			fmt.Sprintf("REQUEST BODY           :\n%v\n", string(body)) +
 			"------------------------------------------------------------------------------\n"
-		client.Logger.Println(reqLog)
+		client.Logger.Debugf(reqLog)
 	}
 	return nil
 }
 func responseLogger(client *Client, request *http.Request, response *Response) error {
 	if client.Debug {
 		e := time.Now()
-		var reqBodyContent []byte
+		var responseBody []byte
 		if response.Body != nil {
-			reqBodyContent, _ = io.ReadAll(response.Body)
-			response.requestBody = reqBodyContent
-			response.Body = NewReadCloser(reqBodyContent, false)
+			responseBody, _ = io.ReadAll(response.Body)
+			response.Body = NewReadCloser(responseBody, false)
 		}
 		s := client.ctx.Value(ctxDebugStartTime).(time.Time)
 		headers, _ := client.JSONMarshal(response.Header)
@@ -50,10 +50,39 @@ func responseLogger(client *Client, request *http.Request, response *Response) e
 			fmt.Sprintf("ATTEMPT      : %v\n", client.attempt) +
 			fmt.Sprintf("RECEIVED AT  : %v\n", e.Format(time.RFC3339Nano)) +
 			fmt.Sprintf("HEADERS      : \n%v\n", string(headers))
-		debugLog += fmt.Sprintf("BODY : \n%s\n", string(reqBodyContent))
+		debugLog += fmt.Sprintf("RESPONSE BODY : \n%s\n", string(responseBody))
 		debugLog += fmt.Sprintf("TIME CONSUMING : %v\n", e.Sub(s))
 		debugLog += "==============================================================================\n"
-		client.Logger.Println(debugLog)
+		client.Logger.Debugf(debugLog)
+		client.ctx = context.Background()
+	}
+	return nil
+}
+
+func writerRequestResponseLog(client *Client, request *http.Request, response *Response) error {
+	if client.writer != nil {
+		var builder strings.Builder
+		builder.WriteString("REQUEST: \n")
+		builder.WriteString(fmt.Sprintf("%s %s %s \n", request.Method, request.URL.String(), request.Proto))
+		reqHeader := request.Header
+		for s := range reqHeader {
+			builder.WriteString(fmt.Sprintf("%s : %s \n", s, reqHeader.Get(s)))
+		}
+		builder.WriteString("\n")
+		builder.WriteString("RESPONSE: \n")
+		builder.WriteString(fmt.Sprintf("%s %s \n", response.Proto, response.Status))
+		respHeader := response.Header
+		for s := range respHeader {
+			builder.WriteString(fmt.Sprintf("%s : %s \n", s, respHeader.Get(s)))
+		}
+		builder.WriteString("\n")
+		var responseBody []byte
+		if response.Body != nil {
+			responseBody, _ = io.ReadAll(response.Body)
+			response.Body = NewReadCloser(responseBody, false)
+		}
+		builder.Write(responseBody)
+		fmt.Fprintf(client.writer, builder.String())
 	}
 	return nil
 }
