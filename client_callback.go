@@ -10,7 +10,7 @@ import (
 //			// manipulate it as per your need
 //			return nil 	// if its success otherwise return error
 //		})
-func (c *Client) OnBeforeRequest(callback ClientCallback) *Client {
+func (c *Client) OnBeforeRequest(callback ClientCallback) ClientInterface {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.beforeRequestCallbacks = append(c.beforeRequestCallbacks, callback)
@@ -24,7 +24,7 @@ func (c *Client) OnBeforeRequest(callback ClientCallback) *Client {
 //
 //			return nil 	// if its success otherwise return error
 //		})
-func (c *Client) OnAfterRequest(callback RequestCallback) *Client {
+func (c *Client) OnAfterRequest(callback RequestCallback) ClientInterface {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.afterRequestCallbacks = append(c.afterRequestCallbacks, callback)
@@ -38,7 +38,7 @@ func (c *Client) OnAfterRequest(callback RequestCallback) *Client {
 //
 //			return nil 	// if its success otherwise return error
 //		})
-func (c *Client) OnResponse(callback ResponseCallback) *Client {
+func (c *Client) OnResponse(callback ResponseCallback) ClientInterface {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.responseCallbacks = append(c.responseCallbacks, callback)
@@ -59,7 +59,7 @@ func (c *Client) OnResponse(callback ResponseCallback) *Client {
 //
 // Out of the OnSuccess, OnError, OnInvalid, OnPanic callbacks, exactly one
 // set will be invoked for each call to Request.Execute() that comletes.
-func (c *Client) OnError(h ErrorHook) *Client {
+func (c *Client) OnError(h ErrorHook) ClientInterface {
 	c.errorHooks = append(c.errorHooks, h)
 	return c
 }
@@ -69,7 +69,7 @@ func (c *Client) OnError(h ErrorHook) *Client {
 //
 // Out of the OnSuccess, OnError, OnInvalid, OnPanic callbacks, exactly one
 // set will be invoked for each call to Request.Execute() that comletes.
-func (c *Client) OnSuccess(h SuccessHook) *Client {
+func (c *Client) OnSuccess(h SuccessHook) ClientInterface {
 	c.successHooks = append(c.successHooks, h)
 	return c
 }
@@ -81,7 +81,7 @@ func (c *Client) OnSuccess(h SuccessHook) *Client {
 // set will be invoked for each call to Request.Execute() that completes.
 // If an OnSuccess, OnError, or OnInvalid callback panics, then the exactly
 // one rule can be violated.
-func (c *Client) OnPanic(h ErrorHook) *Client {
+func (c *Client) OnPanic(h ErrorHook) ClientInterface {
 	c.panicHooks = append(c.panicHooks, h)
 	return c
 }
