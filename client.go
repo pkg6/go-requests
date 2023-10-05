@@ -51,14 +51,6 @@ var (
 	defaultWaitTime    = time.Duration(2000) * time.Millisecond
 )
 
-type (
-	ClientCallback   func(client *Client) error
-	RequestCallback  func(client *Client, request *http.Request) error
-	ResponseCallback func(client *Client, request *http.Request, response *Response) error
-	ErrorHook        func(client *Client, request *http.Request, err error)
-	SuccessHook      func(client *Client, response *Response)
-)
-
 type Client struct {
 	*http.Client
 	Debug bool
@@ -120,17 +112,23 @@ func DefaultHttpClient(localAddr net.Addr) *http.Client {
 	return &http.Client{Transport: transport}
 }
 
-func New() *Client {
-	return new(Client).Clone()
+func New() ClientInterface {
+	return NewClient()
 }
 
-func NewHttpClient(client *http.Client) *Client {
-	return new(Client).Clone().WitchHttpClient(client)
+func NewWithHttpClient(client *http.Client) ClientInterface {
+	return new(Client).SetHttpClient(client).Clone()
+}
+
+func NewClient() *Client {
+	c := new(Client)
+	c.Clone()
+	return c
 }
 
 // Clone
 //Parameter initialization
-func (c *Client) Clone() *Client {
+func (c *Client) Clone() ClientInterface {
 	if c.Client == nil {
 		c.Client = DefaultHttpClient(nil)
 	}
@@ -176,65 +174,65 @@ func (c *Client) Clone() *Client {
 	return c
 }
 
-func (c *Client) WitchHttpClient(client *http.Client) *Client {
+func (c *Client) SetHttpClient(client *http.Client) ClientInterface {
 	c.Client = client
 	return c
 }
-func (c *Client) SetDebug(debug bool) *Client {
+func (c *Client) SetDebug(debug bool) ClientInterface {
 	c.Debug = debug
 	return c
 }
-func (c *Client) SetWriter(writer io.Writer) *Client {
+func (c *Client) SetWriter(writer io.Writer) ClientInterface {
 	c.writer = writer
 	return c
 }
 
-func (c *Client) SetBaseURL(baseUrl string) *Client {
+func (c *Client) SetBaseURL(baseUrl string) ClientInterface {
 	c.BaseUrl = baseUrl
 	return c
 }
 
-func (c *Client) SetQuery(query url.Values) *Client {
+func (c *Client) SetQuery(query url.Values) ClientInterface {
 	c.Query = query
 	return c
 }
 
 // SetJSONMarshaler method sets the JSON marshaler function to marshal the request body.
 // By default,  uses `encoding/json` package to marshal the request body.
-func (c *Client) SetJSONMarshaler(marshaler func(v interface{}) ([]byte, error)) *Client {
+func (c *Client) SetJSONMarshaler(marshaler func(v interface{}) ([]byte, error)) ClientInterface {
 	c.JSONMarshal = marshaler
 	return c
 }
 
 // SetJSONUnmarshaler method sets the JSON unmarshaler function to unmarshal the response body.
-func (c *Client) SetJSONUnmarshaler(unmarshaler func(data []byte, v interface{}) error) *Client {
+func (c *Client) SetJSONUnmarshaler(unmarshaler func(data []byte, v interface{}) error) ClientInterface {
 	c.JSONUnmarshal = unmarshaler
 	return c
 }
 
 // SetXMLMarshaler method sets the XML marshaler function to marshal the request body.
-func (c *Client) SetXMLMarshaler(marshaler func(v any) ([]byte, error)) *Client {
+func (c *Client) SetXMLMarshaler(marshaler func(v any) ([]byte, error)) ClientInterface {
 	c.XMLMarshal = marshaler
 	return c
 }
 
 // SetXMLUnmarshaler method sets the XML unmarshaler function to unmarshal the response body.
 // By default,  uses `encoding/xml` package to unmarshal the response body.
-func (c *Client) SetXMLUnmarshaler(unmarshaler func(data []byte, v any) error) *Client {
+func (c *Client) SetXMLUnmarshaler(unmarshaler func(data []byte, v any) error) ClientInterface {
 	c.XMLUnmarshal = unmarshaler
 	return c
 }
 
 // SetRetry is a chaining function,
 // which sets retry count and interval when failure for next request.
-func (c *Client) SetRetry(retryCount int, retryWaitTime time.Duration) *Client {
+func (c *Client) SetRetry(retryCount int, retryWaitTime time.Duration) ClientInterface {
 	c.retryCount = retryCount
 	c.retryWaitTime = retryWaitTime
 	return c
 }
 
 // Timeout sets the request timeout for the client.
-func (c *Client) Timeout(t time.Duration) *Client {
+func (c *Client) Timeout(t time.Duration) ClientInterface {
 	c.Client.Timeout = t
 	return c
 }
@@ -243,7 +241,7 @@ func (c *Client) Timeout(t time.Duration) *Client {
 // This func will do nothing when the parameter `proxyURL` is empty or in wrong pattern.
 // The correct pattern is like `http://USER:PASSWORD@IP:PORT` or `socks5://USER:PASSWORD@IP:PORT`.
 // Only `http` and `socks5` proxies are supported currently.
-func (c *Client) WithProxyUrl(proxyURL string) *Client {
+func (c *Client) WithProxyUrl(proxyURL string) ClientInterface {
 	if strings.TrimSpace(proxyURL) == "" {
 		return c
 	}
@@ -287,7 +285,7 @@ func (c *Client) WithProxyUrl(proxyURL string) *Client {
 }
 
 // WithTLSKeyCrt sets the certificate and key file for TLS configuration of client.
-func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) *Client {
+func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) ClientInterface {
 	crt, err := tls.LoadX509KeyPair(crtFile, keyFile)
 	if err != nil {
 		c.Logger.Errorf("LoadKeyCrt failed")
@@ -303,7 +301,7 @@ func (c *Client) WithTLSKeyCrt(crtFile, keyFile string) *Client {
 }
 
 // SetTLSConfig sets the TLS configuration of client.
-func (c *Client) SetTLSConfig(tlsConfig *tls.Config) *Client {
+func (c *Client) SetTLSConfig(tlsConfig *tls.Config) ClientInterface {
 	v, ok := c.Transport.(*http.Transport)
 	if !ok {
 		c.Logger.Errorf(`cannot set TLSClientConfig for custom Transport of the client`)
