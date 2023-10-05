@@ -12,6 +12,16 @@ type Response struct {
 	client         *Client
 }
 
+// Close closes the response when it will never be used.
+func (r *Response) Close() error {
+	if r == nil || r.Response == nil {
+		return nil
+	}
+	r.client = nil
+	r.request = nil
+	return r.Response.Body.Close()
+}
+
 func (r *Response) TraceInfo() TraceInfo {
 	ct := r.client.traceContext
 	ti := TraceInfo{
@@ -49,16 +59,12 @@ func (r *Response) TraceInfo() TraceInfo {
 	return ti
 }
 
-func (r *Response) GetCookieMap() Cookie {
+func (r *Response) GetCookie() Cookie {
 	raw := make(Cookie)
 	for _, c := range r.Cookies() {
 		raw.Set(c.Name, c.Value)
 	}
 	return raw
-}
-
-func (r *Response) GetCookie(key string) string {
-	return r.GetCookieMap().Get(key)
 }
 
 // ReadAll retrieves and returns the response content as []byte.
@@ -140,12 +146,4 @@ func (r *Response) IsSuccess() bool {
 // IsError method returns true if HTTP status `code >= 400` otherwise false.
 func (r *Response) IsError() bool {
 	return r.StatusCode > 399
-}
-
-// Close closes the response when it will never be used.
-func (r *Response) Close() error {
-	if r == nil || r.Response == nil {
-		return nil
-	}
-	return r.Response.Body.Close()
 }
