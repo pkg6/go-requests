@@ -6,7 +6,8 @@ import (
 	"time"
 )
 
-func OnAfterRequestWithCookie(cache ICache) RequestCallback {
+// onAfterRequestWithCookieGet get cookie on request
+func onAfterRequestWithCookieGet(cache ICache) RequestCallback {
 	return func(client *Client, request *http.Request) error {
 		cacheKey := Md5(request.URL.Host)
 		if cache.Has(cacheKey) {
@@ -20,7 +21,8 @@ func OnAfterRequestWithCookie(cache ICache) RequestCallback {
 	}
 }
 
-func OnResponseWithCookie(cache ICache, ttl time.Duration) ResponseCallback {
+// onResponseNextRequestWithCookieSet set url cookie on cache
+func onResponseNextRequestWithCookieSet(cache ICache, ttl time.Duration) ResponseCallback {
 	return func(client *Client, request *http.Request, response *Response) error {
 		cacheKey := Md5(request.URL.Host)
 		if !cache.Has(cacheKey) {
