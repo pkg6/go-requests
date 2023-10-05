@@ -5,35 +5,28 @@ import (
 	"os"
 )
 
-type Logger interface {
-	Errorf(format string, v ...any)
-	Warnf(format string, v ...any)
-	Debugf(format string, v ...any)
-}
-type logger struct {
+type Logger struct {
 	l *log.Logger
 }
 
-var _ Logger = (*logger)(nil)
-
-func DefaultLogger() *logger {
-	l := &logger{l: log.New(os.Stderr, "", log.Ldate|log.Lmicroseconds)}
+func DefaultLogger() *Logger {
+	l := &Logger{l: log.New(os.Stderr, "", log.Ldate|log.Lmicroseconds)}
 	return l
 }
 
-func (l *logger) Errorf(format string, v ...interface{}) {
+func (l *Logger) Errorf(format string, v ...interface{}) {
 	l.output("【ERROR】GOREQUEST "+format, v...)
 }
 
-func (l *logger) Warnf(format string, v ...interface{}) {
+func (l *Logger) Warnf(format string, v ...interface{}) {
 	l.output("【WARN】GOREQUEST "+format, v...)
 }
 
-func (l *logger) Debugf(format string, v ...interface{}) {
+func (l *Logger) Debugf(format string, v ...interface{}) {
 	l.output("【DEBUG】GOREQUEST "+format, v...)
 }
 
-func (l *logger) output(format string, v ...interface{}) {
+func (l *Logger) output(format string, v ...interface{}) {
 	if len(v) == 0 {
 		l.l.Print(format)
 		return
