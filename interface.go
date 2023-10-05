@@ -22,6 +22,15 @@ type ClientInterface interface {
 	ClientOwnerInterface
 }
 
+type ClientHttpClientClient interface {
+	SetHttpClient(client *http.Client) ClientInterface
+	Timeout(t time.Duration) ClientInterface
+	WithProxyUrl(proxyURL string) ClientInterface
+	WithTLSKeyCrt(crtFile, keyFile string) ClientInterface
+	SetTLSConfig(tlsConfig *tls.Config) ClientInterface
+	SetCheckRedirect(fn func(req *http.Request, via []*http.Request) error)
+}
+
 type ClientOwnerInterface interface {
 	Clone() ClientInterface
 	SetDebug(debug bool) ClientInterface
@@ -33,17 +42,8 @@ type ClientOwnerInterface interface {
 	SetHeader(header http.Header) ClientInterface
 	ClientFnInterface
 	ClientMiddlewareInterface
-	ClientAppendHeaderInterface
+	ClientHeaderInterface
 	ClientRequestInterface
-}
-
-type ClientHttpClientClient interface {
-	SetHttpClient(client *http.Client) ClientInterface
-	Timeout(t time.Duration) ClientInterface
-	WithProxyUrl(proxyURL string) ClientInterface
-	WithTLSKeyCrt(crtFile, keyFile string) ClientInterface
-	SetTLSConfig(tlsConfig *tls.Config) ClientInterface
-	SetCheckRedirect(fn func(req *http.Request, via []*http.Request) error)
 }
 
 type ClientFnInterface interface {
@@ -61,7 +61,7 @@ type ClientFnInterface interface {
 	OnPanic(h ErrorHook) ClientInterface
 }
 
-type ClientAppendHeaderInterface interface {
+type ClientHeaderInterface interface {
 	WithClientCookieJar(jar http.CookieJar) ClientInterface
 	WithHeader(header, value string) ClientInterface
 	WithHeaderMap(headers map[string]string) ClientInterface
@@ -91,7 +91,6 @@ type ClientMiddlewareInterface interface {
 
 type ClientRequestInterface interface {
 	ClientDoRequestInterface
-	ClientRequestAppendInterface
 	Get(ctx context.Context, uri string, data any) (*Response, error)
 	GetUnmarshal(ctx context.Context, uri string, data, d any) error
 	GetBytes(ctx context.Context, uri string, data any) ([]byte, error)
@@ -127,9 +126,7 @@ type ClientRequestInterface interface {
 	Trace(ctx context.Context, uri string, data any) (*Response, error)
 	TraceUnmarshal(ctx context.Context, uri string, data, d any) error
 	TraceBytes(ctx context.Context, uri string, data any) ([]byte, error)
-}
 
-type ClientRequestAppendInterface interface {
 	PostJson(ctx context.Context, uri string, data any) (*Response, error)
 	PostJsonUnmarshal(ctx context.Context, uri string, data, d any) error
 	PostJsonBytes(ctx context.Context, uri string, data any) ([]byte, error)
