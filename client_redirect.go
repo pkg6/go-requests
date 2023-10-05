@@ -135,7 +135,3 @@ func (c *Client) WithRedirectPolicy(policies ...any) ClientInterface {
 	})
 	return c
 }
-
-func (c *Client) SetCheckRedirect(fn func(req *http.Request, via []*http.Request) error) {
-	c.CheckRedirect = fn
-}
