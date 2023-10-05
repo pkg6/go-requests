@@ -12,27 +12,19 @@ import (
 
 const fileCacheSuffix = ".bin"
 
-type ICache interface {
-	Set(key, value string, ttl time.Duration) error
-	Get(key string) (string, error)
-	Has(key string) bool
-	Delete(key string) error
-	CleanExpired()
-}
 type FileCache struct {
 	dir string
 	mu  sync.Mutex
 }
 
 // NewFileCache
-//使用time.Ticker创建一个定时器,每隔一定间隔(例如5分钟)触发
 //	go func() {
 //		ticker := time.NewTicker(time.Minute * 5)
 //		for range ticker.C {
 //			cache.CleanExpired()
 //		}
 //	}()
-func NewFileCache(paths ...string) ICache {
+func NewFileCache(paths ...string) CacheInterface {
 	dir := os.TempDir() + "grequests/"
 	if len(paths) > 0 {
 		dir = paths[0]

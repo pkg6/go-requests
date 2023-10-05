@@ -3,7 +3,7 @@ package requests
 import "net/http"
 
 const (
-	clientMiddlewareKey ctxKey = "__client_middleware_key"
+	clientMiddlewareKey CtxKey = "__client_middleware_key"
 )
 
 // MiddlewareFunc middleware handler func

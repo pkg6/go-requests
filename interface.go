@@ -15,7 +15,22 @@ type (
 	ResponseCallback func(client *Client, request *http.Request, response *Response) error
 	ErrorHook        func(client *Client, request *http.Request, err error)
 	SuccessHook      func(client *Client, response *Response)
+
+	CtxKey string
 )
+
+type CacheInterface interface {
+	Set(key, value string, ttl time.Duration) error
+	Get(key string) (string, error)
+	Has(key string) bool
+	Delete(key string) error
+	CleanExpired()
+}
+type LoggerInterface interface {
+	Errorf(format string, v ...any)
+	Warnf(format string, v ...any)
+	Debugf(format string, v ...any)
+}
 
 type ClientInterface interface {
 	ClientHttpClientClient
@@ -34,12 +49,13 @@ type ClientHttpClientClient interface {
 type ClientOwnerInterface interface {
 	Clone() ClientInterface
 	SetDebug(debug bool) ClientInterface
-	SetRetry(retryCount int, retryWaitTime time.Duration) ClientInterface
+	SetLogger(logger LoggerInterface) ClientInterface
 	SetWriter(writer io.Writer) ClientInterface
 	SetBaseURL(baseUrl string) ClientInterface
 	SetQuery(query url.Values) ClientInterface
 	SetCookie(cookie Cookie) ClientInterface
 	SetHeader(header http.Header) ClientInterface
+	SetRetry(retryCount int, retryWaitTime time.Duration) ClientInterface
 	ClientFnInterface
 	ClientMiddlewareInterface
 	ClientHeaderInterface
@@ -62,7 +78,7 @@ type ClientFnInterface interface {
 }
 
 type ClientHeaderInterface interface {
-	WithClientCookieJar(jar http.CookieJar) ClientInterface
+	WithClientJar(jar http.CookieJar) ClientInterface
 	WithHeader(header, value string) ClientInterface
 	WithHeaderMap(headers map[string]string) ClientInterface
 	WithHeaderVerbatim(header, value string) ClientInterface
@@ -79,7 +95,7 @@ type ClientHeaderInterface interface {
 	WithCookieString(cookieString string) ClientInterface
 	WithCookie(k, v string) ClientInterface
 	WithCookieMap(cookies map[string]string) ClientInterface
-	WithCookieNextRequest(cache ICache, ttl time.Duration) ClientInterface
+	WithCookieNextRequest(cache CacheInterface, ttl time.Duration) ClientInterface
 
 	WithRedirectPolicy(policies ...any) ClientInterface
 	WithRedirectLimit(redirectLimit int) ClientInterface

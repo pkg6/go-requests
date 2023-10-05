@@ -41,6 +41,9 @@ const (
 	HttpHeaderContentTypeXml             = `application/xml`
 	HttpHeaderContentTypeXmlCharsetUTF8  = HttpHeaderContentTypeXml + "; " + charsetUTF8
 	HttpHeaderContentTypeForm            = `application/x-www-form-urlencoded`
+
+	AuthorizationTypeBearer = "Bearer "
+	AuthorizationTypeBasic  = "Basic "
 )
 
 var (
@@ -59,7 +62,7 @@ type Client struct {
 	Query         url.Values
 	Header        http.Header
 	Cookie        Cookie
-	Logger        Logger
+	Logger        LoggerInterface
 	JSONMarshal   func(v any) ([]byte, error)
 	JSONUnmarshal func(data []byte, v any) error
 	XMLMarshal    func(v any) ([]byte, error)
@@ -75,14 +78,17 @@ type Client struct {
 	successHooks           []SuccessHook
 	errorHooks             []ErrorHook
 	panicHooks             []ErrorHook
-	retryCount             int
-	retryWaitTime          time.Duration
-	lock                   sync.RWMutex
-	traceContext           traceContext
-	trace                  bool
-	attempt                int
-	clone                  int
-	ctx                    context.Context
+
+	retryCount    int
+	retryWaitTime time.Duration
+	attempt       int
+
+	traceContext traceContext
+	trace        bool
+
+	clone int
+	lock  sync.RWMutex
+	ctx   context.Context
 }
 
 // DefaultHttpClient
@@ -129,21 +135,18 @@ func NewClient() *Client {
 // Clone
 //Parameter initialization
 func (c *Client) Clone() ClientInterface {
+	c.Debug = false
 	if c.Client == nil {
 		c.Client = DefaultHttpClient(nil)
 	}
-	c.Debug = false
-	c.Query = nil
 	c.BaseUrl = ""
+	c.Query = make(url.Values, 0)
 	c.Header = make(http.Header, 0)
 	c.Cookie = make(Cookie, 0)
-	c.retryWaitTime = defaultWaitTime
-	c.retryCount = defaultRetryCount
-	c.beforeRequestCallbacks = make([]ClientCallback, 0)
-	c.afterRequestCallbacks = make([]RequestCallback, 0)
-	c.responseCallbacks = make([]ResponseCallback, 0)
-	c.successHooks = make([]SuccessHook, 0)
-	c.errorHooks = make([]ErrorHook, 0)
+
+	if c.Logger == nil {
+		c.SetLogger(DefaultLogger())
+	}
 	if c.JSONMarshal == nil {
 		c.SetJSONMarshaler(json.Marshal)
 	}
@@ -156,14 +159,26 @@ func (c *Client) Clone() ClientInterface {
 	if c.XMLUnmarshal == nil {
 		c.SetXMLUnmarshaler(xml.Unmarshal)
 	}
-	if c.Logger == nil {
-		c.Logger = DefaultLogger()
+
+	c.middlewares = make([]MiddlewareFunc, 0)
+	c.beforeRequestCallbacks = make([]ClientCallback, 0)
+	c.afterRequestCallbacks = make([]RequestCallback, 0)
+	c.responseCallbacks = make([]ResponseCallback, 0)
+	c.successHooks = make([]SuccessHook, 0)
+	c.errorHooks = make([]ErrorHook, 0)
+	c.panicHooks = make([]ErrorHook, 0)
+
+	c.retryCount = defaultRetryCount
+	c.retryWaitTime = defaultWaitTime
+
+	c.traceContext = traceContext{}
+	c.trace = false
+
+	if c.ctx == nil {
+		c.ctx = context.Background()
 	}
 	if c.Header.Get(HttpHeaderUserAgent) == "" {
 		c.WithUserAgent(defaultClientAgent)
-	}
-	if c.ctx == nil {
-		c.ctx = context.Background()
 	}
 	c.writer = nil
 	c.OnAfterRequest(requestLogger)
@@ -180,6 +195,10 @@ func (c *Client) SetHttpClient(client *http.Client) ClientInterface {
 }
 func (c *Client) SetDebug(debug bool) ClientInterface {
 	c.Debug = debug
+	return c
+}
+func (c *Client) SetLogger(logger LoggerInterface) ClientInterface {
+	c.Logger = logger
 	return c
 }
 func (c *Client) SetWriter(writer io.Writer) ClientInterface {
