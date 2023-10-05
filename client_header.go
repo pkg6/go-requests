@@ -1,20 +1,23 @@
 package requests
 
-import "encoding/base64"
+import (
+	"encoding/base64"
+	"net/http"
+)
 
 // WithHeader method sets a single header field and its value in the client instance.
 // These headers will be applied to all requests raised from this client instance.
 // Also it can be overridden at request level header options.
 //		WithHeader("Content-Type", "application/json").
 //		WithHeader("Accept", "application/json")
-func (c *Client) WithHeader(header, value string) *Client {
+func (c *Client) WithHeader(header, value string) ClientInterface {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.Header.Set(header, value)
 	return c
 }
 
-// WithHeaders method sets multiple headers field and its values at one go in the client instance.
+// WithHeaderMap method sets multiple headers field and its values at one go in the client instance.
 // These headers will be applied to all requests raised from this client instance. Also it can be
 // overridden at request level headers options.
 // For Example: To set `Content-Type` and `Accept` as `application/json`
@@ -22,10 +25,14 @@ func (c *Client) WithHeader(header, value string) *Client {
 //			"Content-Type": "application/json",
 //			"Accept": "application/json",
 //		})
-func (c *Client) WithHeaders(headers map[string]string) *Client {
+func (c *Client) WithHeaderMap(headers map[string]string) ClientInterface {
 	for h, v := range headers {
 		c.Header.Set(h, v)
 	}
+	return c
+}
+func (c *Client) SetHeader(header http.Header) ClientInterface {
+	c.Header = header
 	return c
 }
 
@@ -36,34 +43,34 @@ func (c *Client) WithHeaders(headers map[string]string) *Client {
 //		WithHeaderVerbatim("UPPERCASE", "available")
 //
 // Also you can override header value, which was set at client instance level.
-func (c *Client) WithHeaderVerbatim(header, value string) *Client {
+func (c *Client) WithHeaderVerbatim(header, value string) ClientInterface {
 	c.Header[header] = []string{value}
 	return c
 }
 
 // WithContentType is a chaining function,
 // which sets HTTP content type for the next request.
-func (c *Client) WithContentType(contentType string) *Client {
+func (c *Client) WithContentType(contentType string) ClientInterface {
 	c.WithHeader(HttpHeaderContentType, contentType)
 	return c
 }
-func (c *Client) WithUserAgent(userAgent string) *Client {
+func (c *Client) WithUserAgent(userAgent string) ClientInterface {
 	c.WithHeader(HttpHeaderUserAgent, userAgent)
 	return c
 }
 
-func (c *Client) WithRandomUserAgent() *Client {
+func (c *Client) WithRandomUserAgent() ClientInterface {
 	c.WithUserAgent(RandomUserAgent())
 	return c
 }
-func (c *Client) WithRandomMobileUserAgent() *Client {
+func (c *Client) WithRandomMobileUserAgent() ClientInterface {
 	c.WithUserAgent(RandomMobileUserAgent())
 	return c
 }
 
 // AsForm is a chaining function,
 // which sets the HTTP content type as "application/x-www-form-urlencoded" for the next request.
-func (c *Client) AsForm() *Client {
+func (c *Client) AsForm() ClientInterface {
 	c.WithContentType(HttpHeaderContentTypeForm)
 	return c
 }
@@ -82,7 +89,7 @@ func (c *Client) AsForm() *Client {
 // which sets the HTTP content type as "application/json" for the next request.
 //
 // Note that it also checks and encodes the parameter to JSON format automatically.
-func (c *Client) AsJson() *Client {
+func (c *Client) AsJson() ClientInterface {
 	c.WithContentType(HttpHeaderContentTypeJson)
 	return c
 }
@@ -91,23 +98,23 @@ func (c *Client) AsJson() *Client {
 // which sets the HTTP content type as "application/xml" for the next request.
 //
 // Note that it also checks and encodes the parameter to XML format automatically.
-func (c *Client) AsXml() *Client {
+func (c *Client) AsXml() ClientInterface {
 	c.WithContentType(HttpHeaderContentTypeXml)
 	return c
 }
 
 // WithBasicAuth
 //Specify the basic authentication username and password for the request.
-func (c *Client) WithBasicAuth(username, password string) *Client {
+func (c *Client) WithBasicAuth(username, password string) ClientInterface {
 	c.WithToken(base64.StdEncoding.EncodeToString([]byte(username+":"+password)), "Basic ")
 	return c
 }
 
 // WithToken
 //Specify an authorization token for the request.
-func (c *Client) WithToken(token string, Type ...string) *Client {
-	if len(Type) > 0 {
-		token = Type[0] + token
+func (c *Client) WithToken(token string, tokenType ...string) ClientInterface {
+	if len(tokenType) > 0 {
+		token = tokenType[0] + token
 	} else {
 		token = "Bearer " + token
 	}
