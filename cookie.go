@@ -26,7 +26,7 @@ func onResponseNextRequestWithCookieSet(cache ICache, ttl time.Duration) Respons
 	return func(client *Client, request *http.Request, response *Response) error {
 		cacheKey := Md5(request.URL.Host)
 		if !cache.Has(cacheKey) {
-			cookieRaw := response.GetCookieMap()
+			cookieRaw := response.GetCookie()
 			if len(cookieRaw) > 0 {
 				cookieByte, _ := client.JSONMarshal(cookieRaw)
 				_ = cache.Set(cacheKey, string(cookieByte), ttl)

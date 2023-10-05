@@ -145,3 +145,16 @@ type ClientDoRequestInterface interface {
 	DoRequestBytes(ctx context.Context, method string, uri string, data any) ([]byte, error)
 	DoRequest(ctx context.Context, method, uri string, body any) (response *Response, err error)
 }
+
+type ResponseInterface interface {
+	Close() error
+	TraceInfo() TraceInfo
+	GetCookie() Cookie
+	ReadAll() []byte
+	ReadStream(lineNumberFun func(line []byte, number int64)) int64
+	ReadAllString() string
+	ContentType() string
+	Unmarshal(d any) error
+	IsSuccess() bool
+	IsError() bool
+}

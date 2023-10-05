@@ -14,9 +14,6 @@
 $ go get github.com/pkg6/go-requests
 ~~~
 
-## 方法列表
-
- [https://pkg.go.dev/github.com/pkg6/go-requests]( https://pkg.go.dev/github.com/pkg6/go-requests)
 
 ## 基础使用
 
@@ -97,20 +94,23 @@ func main() {
 
 ~~~
 
+## 方法列表
+
+[https://pkg.go.dev/github.com/pkg6/go-requests]( https://pkg.go.dev/github.com/pkg6/go-requests)
+
 ## 返回对象
 
 ~~~
+(r *Response) Close() error
 (r *Response) TraceInfo() TraceInfo
+(r *Response) GetCookie() Cookie
 (r *Response) ReadAll() []byte
-(r *Response) ReadAllString() string
 (r *Response) ReadStream(lineNumberFun func(line []byte, number int64)) int64
-(r *Response) GetCookieMap() map[string]string
-(r *Response) GetCookie(key string) string
+(r *Response) ReadAllString() string
 (r *Response) ContentType() string
-(r *Response) Unmarshal(d any) error 
+(r *Response) Unmarshal(d any) error
 (r *Response) IsSuccess() bool
 (r *Response) IsError() bool
-(r *Response) Close() error 
 ~~~
 
 ## 加入我们
