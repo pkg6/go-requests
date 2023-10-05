@@ -34,11 +34,6 @@ func (c *Client) WithCookieMap(cookies map[string]string) ClientInterface {
 	return c
 }
 
-func (c *Client) SetCookie(cookie Cookie) ClientInterface {
-	c.Cookie = cookie
-	return c
-}
-
 // WithCookieNextRequest
 //  The first access to the root domain name will cache cookie data, and the second access will carry the cookie data from the cache until the cache expires and is regenerated
 //	cache := requests.NewFileCache("you path/cache")

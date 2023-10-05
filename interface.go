@@ -24,11 +24,11 @@ type ClientInterface interface {
 
 type ClientHttpClientClient interface {
 	SetHttpClient(client *http.Client) ClientInterface
-	Timeout(t time.Duration) ClientInterface
+	SetTimeout(t time.Duration) ClientInterface
+	SetCheckRedirect(fn func(req *http.Request, via []*http.Request) error)
+	SetTLSConfig(tlsConfig *tls.Config) ClientInterface
 	WithProxyUrl(proxyURL string) ClientInterface
 	WithTLSKeyCrt(crtFile, keyFile string) ClientInterface
-	SetTLSConfig(tlsConfig *tls.Config) ClientInterface
-	SetCheckRedirect(fn func(req *http.Request, via []*http.Request) error)
 }
 
 type ClientOwnerInterface interface {

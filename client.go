@@ -197,6 +197,15 @@ func (c *Client) SetQuery(query url.Values) ClientInterface {
 	return c
 }
 
+func (c *Client) SetCookie(cookie Cookie) ClientInterface {
+	c.Cookie = cookie
+	return c
+}
+func (c *Client) SetHeader(header http.Header) ClientInterface {
+	c.Header = header
+	return c
+}
+
 // SetJSONMarshaler method sets the JSON marshaler function to marshal the request body.
 // By default,  uses `encoding/json` package to marshal the request body.
 func (c *Client) SetJSONMarshaler(marshaler func(v interface{}) ([]byte, error)) ClientInterface {
@@ -231,8 +240,8 @@ func (c *Client) SetRetry(retryCount int, retryWaitTime time.Duration) ClientInt
 	return c
 }
 
-// Timeout sets the request timeout for the client.
-func (c *Client) Timeout(t time.Duration) ClientInterface {
+// SetTimeout sets the request timeout for the client.
+func (c *Client) SetTimeout(t time.Duration) ClientInterface {
 	c.Client.Timeout = t
 	return c
 }
@@ -309,6 +318,10 @@ func (c *Client) SetTLSConfig(tlsConfig *tls.Config) ClientInterface {
 	}
 	v.TLSClientConfig = tlsConfig
 	return c
+}
+
+func (c *Client) SetCheckRedirect(fn func(req *http.Request, via []*http.Request) error) {
+	c.CheckRedirect = fn
 }
 
 // Unmarshal content into object from JSON or XML

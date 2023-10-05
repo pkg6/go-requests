@@ -2,7 +2,6 @@ package requests
 
 import (
 	"encoding/base64"
-	"net/http"
 )
 
 // WithHeader method sets a single header field and its value in the client instance.
@@ -29,10 +28,6 @@ func (c *Client) WithHeaderMap(headers map[string]string) ClientInterface {
 	for h, v := range headers {
 		c.Header.Set(h, v)
 	}
-	return c
-}
-func (c *Client) SetHeader(header http.Header) ClientInterface {
-	c.Header = header
 	return c
 }
 
