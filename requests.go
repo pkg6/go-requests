@@ -87,7 +87,7 @@ func GetUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.GetD(context.Background(), uri, data, d)
+	return client.GetUnmarshal(context.Background(), uri, data, d)
 }
 
 func Put(uri string, data any, args ...ArgsFunc) (*Response, error) {
@@ -102,7 +102,7 @@ func PutUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.PutD(context.Background(), uri, data, d)
+	return client.PutUnmarshal(context.Background(), uri, data, d)
 }
 func Delete(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -116,7 +116,7 @@ func DeleteUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.DeleteD(context.Background(), uri, data, d)
+	return client.DeleteUnmarshal(context.Background(), uri, data, d)
 }
 func Head(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -130,7 +130,7 @@ func HeadUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.HeadD(context.Background(), uri, data, d)
+	return client.HeadUnmarshal(context.Background(), uri, data, d)
 }
 func Patch(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -144,7 +144,7 @@ func PatchUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.PatchD(context.Background(), uri, data, d)
+	return client.PatchUnmarshal(context.Background(), uri, data, d)
 }
 func Connect(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -158,7 +158,7 @@ func ConnectUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.ConnectD(context.Background(), uri, data, d)
+	return client.ConnectUnmarshal(context.Background(), uri, data, d)
 }
 func Options(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -172,7 +172,7 @@ func OptionsUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.OptionsD(context.Background(), uri, data, d)
+	return client.OptionsUnmarshal(context.Background(), uri, data, d)
 }
 func Trace(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -186,7 +186,7 @@ func TraceUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.TraceD(context.Background(), uri, data, d)
+	return client.TraceUnmarshal(context.Background(), uri, data, d)
 }
 func Post(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -200,7 +200,7 @@ func PostUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.PostD(context.Background(), uri, data, d)
+	return client.PostUnmarshal(context.Background(), uri, data, d)
 }
 func PostJson(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -214,7 +214,7 @@ func PostJsonUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.PostJsonD(context.Background(), uri, data, d)
+	return client.PostJsonUnmarshal(context.Background(), uri, data, d)
 }
 func PostForm(uri string, data url.Values, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -228,7 +228,7 @@ func PostFormUnmarshal(uri string, data url.Values, d any, args ...ArgsFunc) err
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.PostFormD(context.Background(), uri, data, d)
+	return client.PostFormUnmarshal(context.Background(), uri, data, d)
 }
 func PostFormWithFiles(uri string, data url.Values, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -242,7 +242,7 @@ func PostFormWithFilesUnmarshal(uri string, data url.Values, d any, args ...Args
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.PostFormWithFilesD(context.Background(), uri, data, d)
+	return client.PostFormWithFilesUnmarshal(context.Background(), uri, data, d)
 }
 func Request(method, uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := new(Client).Clone()
@@ -257,7 +257,7 @@ func RequestUnmarshal(method, uri string, data, d any, args ...ArgsFunc) error {
 	for _, arg := range args {
 		arg(client)
 	}
-	return client.DoRequestD(context.Background(), method, uri, data, d)
+	return client.DoRequestUnmarshal(context.Background(), method, uri, data, d)
 }
 
 // RequestUnmarshalSaveFile

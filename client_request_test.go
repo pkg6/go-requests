@@ -11,9 +11,9 @@ import (
 
 var defaultRequest = New()
 
-func TestClientRequestD(t *testing.T) {
+func TestClientRequestUnmarshal(t *testing.T) {
 	var resp _testdata.GitHubUser
-	_ = defaultRequest.DoRequestD(context.Background(),
+	_ = defaultRequest.DoRequestUnmarshal(context.Background(),
 		http.MethodGet,
 		"https://api.github.com/users/github", nil, &resp)
 	if resp.Id != 9919 {
