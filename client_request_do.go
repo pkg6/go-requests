@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func (c *Client) DoRequestD(ctx context.Context, method string, uri string, data, d any) error {
+func (c *Client) DoRequestUnmarshal(ctx context.Context, method string, uri string, data, d any) error {
 	response, err := c.DoRequest(ctx, method, uri, data)
 	if err != nil {
 		return nil
