@@ -19,7 +19,7 @@ type clientMiddleware struct {
 }
 
 // Use adds one or more middleware handlers to client.
-func (c *Client) Use(middlewares ...MiddlewareFunc) *Client {
+func (c *Client) Use(middlewares ...MiddlewareFunc) ClientInterface {
 	c.middlewares = append(c.middlewares, middlewares...)
 	return c
 }

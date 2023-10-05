@@ -59,8 +59,8 @@ func (r *Route) GetD() any {
 //	_ = requests.RequestRoute(route)
 //	fmt.Println(route.GetD().(*.tests.GitHubUser))
 func RequestRoute(route IRoute) error {
-	client := new(Client).Clone().WitchHttpClient(DefaultHttpClient(nil))
-	client.WithHeaders(route.GetHeader())
+	client := new(Client).Clone().SetHttpClient(DefaultHttpClient(nil))
+	client.WithHeaderMap(route.GetHeader())
 	client.SetTLSConfig(route.GetTlsConfig())
 	client.WithCookieMap(route.GetCookies())
 	request, err := client.DoRequest(context.Background(), route.GetMethod(), route.GetUri(), route.GetBody())
