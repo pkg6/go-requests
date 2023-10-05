@@ -45,8 +45,8 @@ func (c *Client) WithCookies(cookie Cookie) *Client {
 //	WithCookieNextRequest(cache, time.Hour)
 func (c *Client) WithCookieNextRequest(cache ICache, ttl time.Duration) *Client {
 	//set cookie
-	c.OnResponse(OnResponseWithCookie(cache, ttl))
+	c.OnResponse(onResponseNextRequestWithCookieSet(cache, ttl))
 	// get cookie
-	c.OnAfterRequest(OnAfterRequestWithCookie(cache))
+	c.OnAfterRequest(onAfterRequestWithCookieGet(cache))
 	return c
 }

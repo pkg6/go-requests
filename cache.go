@@ -113,7 +113,6 @@ func (f *FileCache) CleanExpired() {
 }
 
 func (f *FileCache) getCacheItemByCacheFile(cacheFile string) (item cacheItem, err error) {
-
 	fileItem, err := os.ReadFile(cacheFile)
 	if err != nil {
 		return item, err
