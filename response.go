@@ -23,40 +23,7 @@ func (r *Response) Close() error {
 }
 
 func (r *Response) TraceInfo() TraceInfo {
-	ct := r.client.traceContext
-	ti := TraceInfo{
-		DNSLookup:      ct.dnsDone.Sub(ct.dnsStart),
-		TLSHandshake:   ct.tlsHandshakeDone.Sub(ct.tlsHandshakeStart),
-		ServerTime:     ct.gotFirstResponseByte.Sub(ct.gotConn),
-		IsConnReused:   ct.gotConnInfo.Reused,
-		IsConnWasIdle:  ct.gotConnInfo.WasIdle,
-		ConnIdleTime:   ct.gotConnInfo.IdleTime,
-		RequestAttempt: r.client.attempt,
-	}
-	// Calculate the total time accordingly,
-	// when connection is reused
-	if ct.gotConnInfo.Reused {
-		ti.TotalTime = ct.endTime.Sub(ct.getConn)
-	} else {
-		ti.TotalTime = ct.endTime.Sub(ct.dnsStart)
-	}
-	// Only calculate on successful connections
-	if !ct.connectDone.IsZero() {
-		ti.TCPConnTime = ct.connectDone.Sub(ct.dnsDone)
-	}
-	// Only calculate on successful connections
-	if !ct.gotConn.IsZero() {
-		ti.ConnTime = ct.gotConn.Sub(ct.getConn)
-	}
-	// Only calculate on successful connections
-	if !ct.gotFirstResponseByte.IsZero() {
-		ti.ResponseTime = ct.endTime.Sub(ct.gotFirstResponseByte)
-	}
-	// Capture remote address info when connection is non-nil
-	if ct.gotConnInfo.Conn != nil {
-		ti.RemoteAddr = ct.gotConnInfo.Conn.RemoteAddr()
-	}
-	return ti
+	return r.client.getTraceInfo()
 }
 
 func (r *Response) GetCookie() Cookie {

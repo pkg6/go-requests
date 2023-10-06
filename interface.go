@@ -49,6 +49,8 @@ type ClientHttpClientClient interface {
 type ClientOwnerInterface interface {
 	Clone() ClientInterface
 	SetDebug(debug bool) ClientInterface
+	EnableDebug() ClientInterface
+	EnableTrace() ClientInterface
 	SetLogger(logger LoggerInterface) ClientInterface
 	SetWriter(writer io.Writer) ClientInterface
 	SetBaseURL(baseUrl string) ClientInterface

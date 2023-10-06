@@ -197,6 +197,10 @@ func (c *Client) SetDebug(debug bool) ClientInterface {
 	c.Debug = debug
 	return c
 }
+func (c *Client) EnableDebug() ClientInterface {
+	return c.SetDebug(true)
+}
+
 func (c *Client) SetLogger(logger LoggerInterface) ClientInterface {
 	c.Logger = logger
 	return c
