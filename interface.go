@@ -16,7 +16,7 @@ type (
 	ErrorHook        func(client *Client, request *http.Request, err error)
 	SuccessHook      func(client *Client, response *Response)
 
-	CtxKey string
+	CtxKeyString string
 )
 
 type CacheInterface interface {
