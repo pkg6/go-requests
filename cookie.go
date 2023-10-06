@@ -7,7 +7,7 @@ import (
 )
 
 // onAfterRequestWithCookieGet get cookie on request
-func onAfterRequestWithCookieGet(cache ICache) RequestCallback {
+func onAfterRequestWithCookieGet(cache CacheInterface) RequestCallback {
 	return func(client *Client, request *http.Request) error {
 		cacheKey := Md5(request.URL.Host)
 		if cache.Has(cacheKey) {
@@ -22,7 +22,7 @@ func onAfterRequestWithCookieGet(cache ICache) RequestCallback {
 }
 
 // onResponseNextRequestWithCookieSet set url cookie on cache
-func onResponseNextRequestWithCookieSet(cache ICache, ttl time.Duration) ResponseCallback {
+func onResponseNextRequestWithCookieSet(cache CacheInterface, ttl time.Duration) ResponseCallback {
 	return func(client *Client, request *http.Request, response *Response) error {
 		cacheKey := Md5(request.URL.Host)
 		if !cache.Has(cacheKey) {
