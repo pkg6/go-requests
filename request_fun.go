@@ -284,7 +284,10 @@ func RequestUnmarshalSaveFile(method, uri string, data, d any, fileName string, 
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	body, _ := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
 	if err = client.Unmarshal(resp.ContentType(), body, d); err != nil {
 		return err
 	}

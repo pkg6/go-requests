@@ -9,10 +9,10 @@ import (
 // Also it can be overridden at request level header options.
 //		WithHeader("Content-Type", "application/json").
 //		WithHeader("Accept", "application/json")
-func (c *Client) WithHeader(header, value string) ClientInterface {
+func (c *Client) WithHeader(k, v string) ClientInterface {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	c.Header.Set(header, value)
+	c.Header.Set(k, v)
 	return c
 }
 
@@ -38,8 +38,8 @@ func (c *Client) WithHeaderMap(headers map[string]string) ClientInterface {
 //		WithHeaderVerbatim("UPPERCASE", "available")
 //
 // Also you can override header value, which was set at client instance level.
-func (c *Client) WithHeaderVerbatim(header, value string) ClientInterface {
-	c.Header[header] = []string{value}
+func (c *Client) WithHeaderVerbatim(k, v string) ClientInterface {
+	c.Header[k] = []string{v}
 	return c
 }
 
@@ -70,16 +70,6 @@ func (c *Client) AsForm() ClientInterface {
 	return c
 }
 
-// AsStream is a Stream
-//func (c *Client) AsStream() *Client {
-//	c.WithHeaders(map[string]string{
-//		HttpHeaderAccept:       HttpMIMEEventStream,
-//		HttpHeaderCacheControl: "no-cache",
-//		HttpHeaderConnection:   "keep-alive",
-//	})
-//	return c
-//}
-
 // AsJson is a chaining function,
 // which sets the HTTP content type as "application/json" for the next request.
 //
@@ -101,17 +91,17 @@ func (c *Client) AsXml() ClientInterface {
 // WithBasicAuth
 //Specify the basic authentication username and password for the request.
 func (c *Client) WithBasicAuth(username, password string) ClientInterface {
-	c.WithToken(base64.StdEncoding.EncodeToString([]byte(username+":"+password)), "Basic ")
+	c.WithToken(base64.StdEncoding.EncodeToString([]byte(username+":"+password)), AuthorizationTypeBasic)
 	return c
 }
 
 // WithToken
 //Specify an authorization token for the request.
-func (c *Client) WithToken(token string, tokenType ...string) ClientInterface {
-	if len(tokenType) > 0 {
-		token = tokenType[0] + token
+func (c *Client) WithToken(token string, authorizationType ...string) ClientInterface {
+	if len(authorizationType) > 0 {
+		token = authorizationType[0] + token
 	} else {
-		token = "Bearer " + token
+		token = AuthorizationTypeBearer + token
 	}
 	c.Header.Set(HttpHeaderAuthorization, token)
 	return c

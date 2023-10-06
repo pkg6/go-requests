@@ -11,9 +11,13 @@ import (
 // from and to server.
 func (c *Client) BrowserMode() ClientInterface {
 	jar, _ := cookiejar.New(nil)
-	return c.WithClientCookieJar(jar)
+	return c.WithClientJar(jar)
 }
-func (c *Client) WithClientCookieJar(jar http.CookieJar) ClientInterface {
+
+// WithClientJar
+// exp: jar, _ := cookiejar.New(nil)
+// WithClientCookieJar(jar)
+func (c *Client) WithClientJar(jar http.CookieJar) ClientInterface {
 	c.Client.Jar = jar
 	return c
 }
@@ -38,7 +42,7 @@ func (c *Client) WithCookieMap(cookies map[string]string) ClientInterface {
 //  The first access to the root domain name will cache cookie data, and the second access will carry the cookie data from the cache until the cache expires and is regenerated
 //	cache := requests.NewFileCache("you path/cache")
 //	WithCookieNextRequest(cache, time.Hour)
-func (c *Client) WithCookieNextRequest(cache ICache, ttl time.Duration) ClientInterface {
+func (c *Client) WithCookieNextRequest(cache CacheInterface, ttl time.Duration) ClientInterface {
 	//set cookie
 	c.OnResponse(onResponseNextRequestWithCookieSet(cache, ttl))
 	// get cookie

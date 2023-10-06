@@ -18,9 +18,13 @@ func (c *Client) withContext(ctx context.Context) context.Context {
 	}
 	return ctx
 }
-func (c *Client) EnableTrace() *Client {
+func (c *Client) EnableTrace() ClientInterface {
 	c.trace = true
 	return c
+}
+
+func (c *Client) getTraceInfo() TraceInfo {
+	return c.traceContext.Get(c)
 }
 
 type TraceInfo struct {
@@ -107,4 +111,41 @@ func (t *traceContext) createContext(ctx context.Context) context.Context {
 			},
 		},
 	)
+}
+
+func (t *traceContext) Get(client *Client) TraceInfo {
+	ct := t
+	ti := TraceInfo{
+		DNSLookup:      ct.dnsDone.Sub(ct.dnsStart),
+		TLSHandshake:   ct.tlsHandshakeDone.Sub(ct.tlsHandshakeStart),
+		ServerTime:     ct.gotFirstResponseByte.Sub(ct.gotConn),
+		IsConnReused:   ct.gotConnInfo.Reused,
+		IsConnWasIdle:  ct.gotConnInfo.WasIdle,
+		ConnIdleTime:   ct.gotConnInfo.IdleTime,
+		RequestAttempt: client.attempt,
+	}
+	// Calculate the total time accordingly,
+	// when connection is reused
+	if ct.gotConnInfo.Reused {
+		ti.TotalTime = ct.endTime.Sub(ct.getConn)
+	} else {
+		ti.TotalTime = ct.endTime.Sub(ct.dnsStart)
+	}
+	// Only calculate on successful connections
+	if !ct.connectDone.IsZero() {
+		ti.TCPConnTime = ct.connectDone.Sub(ct.dnsDone)
+	}
+	// Only calculate on successful connections
+	if !ct.gotConn.IsZero() {
+		ti.ConnTime = ct.gotConn.Sub(ct.getConn)
+	}
+	// Only calculate on successful connections
+	if !ct.gotFirstResponseByte.IsZero() {
+		ti.ResponseTime = ct.endTime.Sub(ct.gotFirstResponseByte)
+	}
+	// Capture remote address info when connection is non-nil
+	if ct.gotConnInfo.Conn != nil {
+		ti.RemoteAddr = ct.gotConnInfo.Conn.RemoteAddr()
+	}
+	return ti
 }

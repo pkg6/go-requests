@@ -9,10 +9,8 @@ import (
 	"time"
 )
 
-type ctxKey string
-
 const (
-	ctxDebugStartTime ctxKey = "_request_debug_logger_start_time"
+	ctxDebugStartTime CtxKeyString = "_request_debug_logger_start_time"
 )
 
 func requestLogger(client *Client, request *http.Request) error {
