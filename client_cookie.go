@@ -27,6 +27,8 @@ func (c *Client) WithCookieString(cookieString string) ClientInterface {
 }
 
 func (c *Client) WithCookie(k, v string) ClientInterface {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	c.Cookie.Set(k, v)
 	return c
 }
