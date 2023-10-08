@@ -10,72 +10,72 @@ import (
 
 //requests helper function
 
-type ArgsFunc func(client ClientInterface)
+type ArgsFunc func(client *Client)
 
 func Debug() ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.SetDebug(true)
 	}
 }
 func WithCookie(k, v string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithCookie(k, v)
 	}
 }
 func WithCookies(cookies map[string]string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithCookieMap(cookies)
 	}
 }
 
 func WithHeader(header, value string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithHeader(header, value)
 	}
 }
 func WithHeaders(headers map[string]string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithHeaderMap(headers)
 	}
 }
 func WithContentType(contentType string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithContentType(contentType)
 	}
 }
 func WithUserAgent(userAgent string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithUserAgent(userAgent)
 	}
 }
 func WithBasicAuth(username, password string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithBasicAuth(username, password)
 	}
 }
 func WithToken(token string, Type ...string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithToken(token, Type...)
 	}
 }
 func WithProxyUrl(proxyURL string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithProxyUrl(proxyURL)
 	}
 }
 func WithTLSKeyCrt(crtFile, keyFile string) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.WithTLSKeyCrt(crtFile, keyFile)
 	}
 }
 func SetTLSConfig(tlsConfig *tls.Config) ArgsFunc {
-	return func(client ClientInterface) {
+	return func(client *Client) {
 		client.SetTLSConfig(tlsConfig)
 	}
 }
 
 func Get(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
@@ -83,7 +83,7 @@ func Get(uri string, data any, args ...ArgsFunc) (*Response, error) {
 }
 
 func GetUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
@@ -91,161 +91,161 @@ func GetUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 }
 
 func Put(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.Put(context.Background(), uri, data)
 }
 func PutUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PutUnmarshal(context.Background(), uri, data, d)
 }
 func Delete(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.Delete(context.Background(), uri, data)
 }
 func DeleteUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.DeleteUnmarshal(context.Background(), uri, data, d)
 }
 func Head(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.Head(context.Background(), uri, data)
 }
 func HeadUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.HeadUnmarshal(context.Background(), uri, data, d)
 }
 func Patch(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.Patch(context.Background(), uri, data)
 }
 func PatchUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PatchUnmarshal(context.Background(), uri, data, d)
 }
 func Connect(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.Connect(context.Background(), uri, data)
 }
 func ConnectUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.ConnectUnmarshal(context.Background(), uri, data, d)
 }
 func Options(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.Options(context.Background(), uri, data)
 }
 func OptionsUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.OptionsUnmarshal(context.Background(), uri, data, d)
 }
 func Trace(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.Trace(context.Background(), uri, data)
 }
 func TraceUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.TraceUnmarshal(context.Background(), uri, data, d)
 }
 func Post(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.Post(context.Background(), uri, data)
 }
 func PostUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PostUnmarshal(context.Background(), uri, data, d)
 }
 func PostJson(uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PostJson(context.Background(), uri, data)
 }
 func PostJsonUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PostJsonUnmarshal(context.Background(), uri, data, d)
 }
 func PostForm(uri string, data url.Values, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PostForm(context.Background(), uri, data)
 }
 func PostFormUnmarshal(uri string, data url.Values, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PostFormUnmarshal(context.Background(), uri, data, d)
 }
 func PostFormWithFiles(uri string, data url.Values, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PostFormWithFiles(context.Background(), uri, data)
 }
 func PostFormWithFilesUnmarshal(uri string, data url.Values, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
 	return client.PostFormWithFilesUnmarshal(context.Background(), uri, data, d)
 }
 func Request(method, uri string, data any, args ...ArgsFunc) (*Response, error) {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
@@ -253,7 +253,7 @@ func Request(method, uri string, data any, args ...ArgsFunc) (*Response, error) 
 }
 
 func RequestUnmarshal(method, uri string, data, d any, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
@@ -268,7 +268,7 @@ func RequestUnmarshal(method, uri string, data, d any, args ...ArgsFunc) error {
 //	fmt.Println(err)
 //	fmt.Println(resp)
 func RequestUnmarshalSaveFile(method, uri string, data, d any, fileName string, args ...ArgsFunc) error {
-	client := New()
+	client := NewClient()
 	for _, arg := range args {
 		arg(client)
 	}
