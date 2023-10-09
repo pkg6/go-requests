@@ -20,9 +20,9 @@ import (
 )
 
 const (
-	httpSchemeName      = `http`
-	httpParamFileHolder = `@file:`
-	httpRegexParamJson  = `^[\w\[\]]+=.+`
+	HttpSchemeName      = `http`
+	HttpParamFileHolder = `@file:`
+	HttpRegexParamJson  = `^[\w\[\]]+=.+`
 
 	HttpHeaderHost   = `Host`
 	HttpHeaderCookie = `Cookie`
@@ -35,11 +35,11 @@ const (
 	HttpHeaderConnection    = "Connection"
 	HttpHeaderContentType   = `Content-Type`
 
-	charsetUTF8                          = "charset=UTF-8"
+	CharsetUTF8                          = "charset=UTF-8"
 	HttpHeaderContentTypeJson            = `application/json`
-	HttpHeaderContentTypeJsonCharsetUTF8 = HttpHeaderContentTypeJson + "; " + charsetUTF8
+	HttpHeaderContentTypeJsonCharsetUTF8 = HttpHeaderContentTypeJson + "; " + CharsetUTF8
 	HttpHeaderContentTypeXml             = `application/xml`
-	HttpHeaderContentTypeXmlCharsetUTF8  = HttpHeaderContentTypeXml + "; " + charsetUTF8
+	HttpHeaderContentTypeXmlCharsetUTF8  = HttpHeaderContentTypeXml + "; " + CharsetUTF8
 	HttpHeaderContentTypeForm            = `application/x-www-form-urlencoded`
 
 	AuthorizationTypeBearer = "Bearer "
@@ -282,7 +282,7 @@ func (c *Client) WithProxyUrl(proxyURL string) ClientInterface {
 		c.Logger.Errorf(`%+v`, err)
 		return c
 	}
-	if _proxy.Scheme == httpSchemeName {
+	if _proxy.Scheme == HttpSchemeName {
 		if v, ok := c.Transport.(*http.Transport); ok {
 			v.Proxy = http.ProxyURL(_proxy)
 		}

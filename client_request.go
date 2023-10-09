@@ -121,8 +121,8 @@ func (c *Client) PostFormWithFiles(ctx context.Context, uri string, data url.Val
 	w := multipart.NewWriter(body)
 	for k := range data {
 		v := data.Get(k)
-		if strings.Contains(v, httpParamFileHolder) {
-			localPathFile := strings.ReplaceAll(strings.ReplaceAll(v, httpParamFileHolder, ""), " ", "")
+		if strings.Contains(v, HttpParamFileHolder) {
+			localPathFile := strings.ReplaceAll(strings.ReplaceAll(v, HttpParamFileHolder, ""), " ", "")
 			osFile, err := os.Open(localPathFile)
 			if err != nil {
 				return nil, err
