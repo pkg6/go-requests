@@ -111,15 +111,6 @@ func (c *Client) doResponseCallbacks(request *http.Request, response *Response) 
 	return nil
 }
 
-type ResponseError struct {
-	Response *Response
-	Err      error
-}
-
-func (e *ResponseError) Error() string {
-	return e.Err.Error()
-}
-
 // Helper to run errorHooks hooks.
 // It wraps the error in a ResponseError if the response is not nil
 // so hooks can access it.

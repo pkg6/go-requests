@@ -19,6 +19,9 @@ func (c *Client) DoRequestUnmarshal(ctx context.Context, method string, uri stri
 	defer func() {
 		_ = response.Close()
 	}()
+	if response.IsError() {
+		return &RequestError{StatusCode: response.StatusCode, Method: method, URI: uri, Response: response}
+	}
 	return response.Unmarshal(d)
 }
 
@@ -30,6 +33,9 @@ func (c *Client) DoRequestBytes(ctx context.Context, method string, uri string, 
 	defer func() {
 		_ = response.Close()
 	}()
+	if response.IsError() {
+		return nil, &RequestError{StatusCode: response.StatusCode, Method: method, URI: uri, Response: response}
+	}
 	return response.ReadAll(), nil
 }
 
