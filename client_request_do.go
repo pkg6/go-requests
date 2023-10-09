@@ -88,6 +88,7 @@ func (c *Client) DoRequest(ctx context.Context, method, uri string, body any) (r
 		c.doErrorHooks(request, response, err)
 		return nil, err
 	}
+	c.doSuccessHooks(response)
 	return response, err
 }
 func (c *Client) callRequest(request *http.Request) (response *Response, err error) {
