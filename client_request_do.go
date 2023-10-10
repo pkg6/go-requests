@@ -19,6 +19,9 @@ func (c *Client) DoRequestUnmarshal(ctx context.Context, method string, uri stri
 	defer func() {
 		_ = response.Close()
 	}()
+	if response.IsError() {
+		return &RequestError{StatusCode: response.StatusCode, Method: method, URI: uri, Response: response}
+	}
 	return response.Unmarshal(d)
 }
 
@@ -30,6 +33,9 @@ func (c *Client) DoRequestBytes(ctx context.Context, method string, uri string, 
 	defer func() {
 		_ = response.Close()
 	}()
+	if response.IsError() {
+		return nil, &RequestError{StatusCode: response.StatusCode, Method: method, URI: uri, Response: response}
+	}
 	return response.ReadAll(), nil
 }
 
@@ -82,6 +88,7 @@ func (c *Client) DoRequest(ctx context.Context, method, uri string, body any) (r
 		c.doErrorHooks(request, response, err)
 		return nil, err
 	}
+	c.doSuccessHooks(response)
 	return response, err
 }
 func (c *Client) callRequest(request *http.Request) (response *Response, err error) {
@@ -177,8 +184,8 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 	if len(c.BaseUrl) > 0 {
 		uri = c.BaseUrl + strings.Trim(uri, "")
 	}
-	if !strings.Contains(uri, httpSchemeName) {
-		uri = httpSchemeName + "://" + uri
+	if !strings.Contains(uri, HttpSchemeName) {
+		uri = HttpSchemeName + "://" + uri
 	}
 	if c.Query != nil {
 		uri = URIQuery(uri, c.Query).String()
@@ -219,7 +226,7 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 				if (paramBytes[0] == '[' || paramBytes[0] == '{') && json.Valid(paramBytes) {
 					// Auto-detecting and setting the post content format: JSON.
 					request.Header.Set(HttpHeaderContentType, HttpHeaderContentTypeJson)
-				} else if IsMatchString(httpRegexParamJson, params) {
+				} else if IsMatchString(HttpRegexParamJson, params) {
 					// If the parameters passed like "name=value", it then uses form type.
 					request.Header.Set(HttpHeaderContentType, HttpHeaderContentTypeForm)
 				}

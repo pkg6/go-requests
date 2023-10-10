@@ -16,6 +16,14 @@ func (c *Client) OnBeforeRequest(callback ClientCallback) ClientInterface {
 	c.beforeRequestCallbacks = append(c.beforeRequestCallbacks, callback)
 	return c
 }
+func (c *Client) doBeforeRequestCallbacks() error {
+	for _, fn := range c.beforeRequestCallbacks {
+		if err := fn(c); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // OnAfterRequest method appends request callback into the before request chain.
 //	client.OnAfterRequest(func(client *requests.Client, request *http.Request) error{
@@ -30,6 +38,14 @@ func (c *Client) OnAfterRequest(callback RequestCallback) ClientInterface {
 	c.afterRequestCallbacks = append(c.afterRequestCallbacks, callback)
 	return c
 }
+func (c *Client) doAfterRequestCallbacks(request *http.Request) error {
+	for _, fn := range c.afterRequestCallbacks {
+		if err := fn(c, request); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // OnResponse method appends response callback into the after response chain.
 //	client.OnResponse(func(request *http.Request, response *requests.Response) error {
@@ -43,6 +59,29 @@ func (c *Client) OnResponse(callback ResponseCallback) ClientInterface {
 	defer c.lock.Unlock()
 	c.responseCallbacks = append(c.responseCallbacks, callback)
 	return c
+}
+func (c *Client) doResponseCallbacks(request *http.Request, response *Response) error {
+	for _, fn := range c.responseCallbacks {
+		if err := fn(c, request, response); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// OnSuccess method adds a callback that will be run whenever a request execution
+// succeeds.  This is called after all retries have been attempted (if any).
+//
+// Out of the OnSuccess, OnError, OnInvalid, OnPanic callbacks, exactly one
+// set will be invoked for each call to Request.Execute() that comletes.
+func (c *Client) OnSuccess(h SuccessHook) ClientInterface {
+	c.successHooks = append(c.successHooks, h)
+	return c
+}
+func (c *Client) doSuccessHooks(resp *Response) {
+	for _, h := range c.successHooks {
+		h(c, resp)
+	}
 }
 
 // OnError method adds a callback that will be run whenever a request execution fails.
@@ -64,62 +103,6 @@ func (c *Client) OnError(h ErrorHook) ClientInterface {
 	return c
 }
 
-// OnSuccess method adds a callback that will be run whenever a request execution
-// succeeds.  This is called after all retries have been attempted (if any).
-//
-// Out of the OnSuccess, OnError, OnInvalid, OnPanic callbacks, exactly one
-// set will be invoked for each call to Request.Execute() that comletes.
-func (c *Client) OnSuccess(h SuccessHook) ClientInterface {
-	c.successHooks = append(c.successHooks, h)
-	return c
-}
-
-// OnPanic method adds a callback that will be run whever a request execution
-// panics.
-//
-// Out of the OnSuccess, OnError, OnInvalid, OnPanic callbacks, exactly one
-// set will be invoked for each call to Request.Execute() that completes.
-// If an OnSuccess, OnError, or OnInvalid callback panics, then the exactly
-// one rule can be violated.
-func (c *Client) OnPanic(h ErrorHook) ClientInterface {
-	c.panicHooks = append(c.panicHooks, h)
-	return c
-}
-
-func (c *Client) doBeforeRequestCallbacks() error {
-	for _, fn := range c.beforeRequestCallbacks {
-		if err := fn(c); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-func (c *Client) doAfterRequestCallbacks(request *http.Request) error {
-	for _, fn := range c.afterRequestCallbacks {
-		if err := fn(c, request); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-func (c *Client) doResponseCallbacks(request *http.Request, response *Response) error {
-	for _, fn := range c.responseCallbacks {
-		if err := fn(c, request, response); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type ResponseError struct {
-	Response *Response
-	Err      error
-}
-
-func (e *ResponseError) Error() string {
-	return e.Err.Error()
-}
-
 // Helper to run errorHooks hooks.
 // It wraps the error in a ResponseError if the response is not nil
 // so hooks can access it.
@@ -136,6 +119,18 @@ func (c *Client) doErrorHooks(request *http.Request, response *Response, err err
 			h(c, response)
 		}
 	}
+}
+
+// OnPanic method adds a callback that will be run whever a request execution
+// panics.
+//
+// Out of the OnSuccess, OnError, OnInvalid, OnPanic callbacks, exactly one
+// set will be invoked for each call to Request.Execute() that completes.
+// If an OnSuccess, OnError, or OnInvalid callback panics, then the exactly
+// one rule can be violated.
+func (c *Client) OnPanic(h ErrorHook) ClientInterface {
+	c.panicHooks = append(c.panicHooks, h)
+	return c
 }
 
 // Helper to run panicHooks hooks.
