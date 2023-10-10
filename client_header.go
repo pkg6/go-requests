@@ -26,7 +26,7 @@ func (c *Client) WithHeader(k, v string) ClientInterface {
 //		})
 func (c *Client) WithHeaderMap(headers map[string]string) ClientInterface {
 	for h, v := range headers {
-		c.Header.Set(h, v)
+		c.WithHeader(h, v)
 	}
 	return c
 }
