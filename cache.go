@@ -93,12 +93,14 @@ func (f *FileCache) Delete(key string) error {
 	return nil
 }
 
-func (f *FileCache) CleanExpired() {
-	_ = filepath.Walk(f.dir, func(cachePathOrPath string, info os.FileInfo, err error) error {
-		if path.Ext(info.Name()) == fileCacheSuffix {
-			f.mu.Lock()
-			defer f.mu.Unlock()
-			_, _ = f.getCacheItemByCacheFile(cachePathOrPath)
+func (f *FileCache) CleanExpired() error {
+	return filepath.Walk(f.dir, func(cachePathOrPath string, info os.FileInfo, err error) error {
+		if info != nil {
+			if path.Ext(info.Name()) == fileCacheSuffix {
+				f.mu.Lock()
+				defer f.mu.Unlock()
+				_, _ = f.getCacheItemByCacheFile(cachePathOrPath)
+			}
 		}
 		return nil
 	})

@@ -24,7 +24,7 @@ type CacheInterface interface {
 	Get(key string) (string, error)
 	Has(key string) bool
 	Delete(key string) error
-	CleanExpired()
+	CleanExpired() error
 }
 type LoggerInterface interface {
 	Errorf(format string, v ...any)
