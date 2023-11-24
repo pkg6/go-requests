@@ -66,6 +66,8 @@ func writerRequestResponseLog(client *Client, request *http.Request, response *R
 		var builder strings.Builder
 		builder.WriteString("REQUEST: \n")
 		builder.WriteString(fmt.Sprintf("%s %s %s \n", request.Method, request.URL.String(), request.Proto))
+		builder.WriteString(fmt.Sprintf("Clone: %d \n", client.clone))
+		builder.WriteString(fmt.Sprintf("Attempt: %d \n", client.attempt))
 		reqHeader := request.Header
 		for s := range reqHeader {
 			builder.WriteString(fmt.Sprintf("%s : %s \n", s, reqHeader.Get(s)))
