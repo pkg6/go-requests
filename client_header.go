@@ -9,7 +9,7 @@ import (
 // Also it can be overridden at request level header options.
 //		WithHeader("Content-Type", "application/json").
 //		WithHeader("Accept", "application/json")
-func (c *Client) WithHeader(k, v string) ClientInterface {
+func (c *Client) WithHeader(k, v string) *Client {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.Header.Set(k, v)
@@ -24,7 +24,7 @@ func (c *Client) WithHeader(k, v string) ClientInterface {
 //			"Content-Type": "application/json",
 //			"Accept": "application/json",
 //		})
-func (c *Client) WithHeaderMap(headers map[string]string) ClientInterface {
+func (c *Client) WithHeaderMap(headers map[string]string) *Client {
 	for h, v := range headers {
 		c.WithHeader(h, v)
 	}
@@ -38,34 +38,34 @@ func (c *Client) WithHeaderMap(headers map[string]string) ClientInterface {
 //		WithHeaderVerbatim("UPPERCASE", "available")
 //
 // Also you can override header value, which was set at client instance level.
-func (c *Client) WithHeaderVerbatim(k, v string) ClientInterface {
+func (c *Client) WithHeaderVerbatim(k, v string) *Client {
 	c.Header[k] = []string{v}
 	return c
 }
 
 // WithContentType is a chaining function,
 // which sets HTTP content type for the next request.
-func (c *Client) WithContentType(contentType string) ClientInterface {
+func (c *Client) WithContentType(contentType string) *Client {
 	c.WithHeader(HttpHeaderContentType, contentType)
 	return c
 }
-func (c *Client) WithUserAgent(userAgent string) ClientInterface {
+func (c *Client) WithUserAgent(userAgent string) *Client {
 	c.WithHeader(HttpHeaderUserAgent, userAgent)
 	return c
 }
 
-func (c *Client) WithRandomUserAgent() ClientInterface {
+func (c *Client) WithRandomUserAgent() *Client {
 	c.WithUserAgent(RandomUserAgent())
 	return c
 }
-func (c *Client) WithRandomMobileUserAgent() ClientInterface {
+func (c *Client) WithRandomMobileUserAgent() *Client {
 	c.WithUserAgent(RandomMobileUserAgent())
 	return c
 }
 
 // AsForm is a chaining function,
 // which sets the HTTP content type as "application/x-www-form-urlencoded" for the next request.
-func (c *Client) AsForm() ClientInterface {
+func (c *Client) AsForm() *Client {
 	c.WithContentType(HttpHeaderContentTypeForm)
 	return c
 }
@@ -74,7 +74,7 @@ func (c *Client) AsForm() ClientInterface {
 // which sets the HTTP content type as "application/json" for the next request.
 //
 // Note that it also checks and encodes the parameter to JSON format automatically.
-func (c *Client) AsJson() ClientInterface {
+func (c *Client) AsJson() *Client {
 	c.WithContentType(HttpHeaderContentTypeJson)
 	return c
 }
@@ -83,21 +83,21 @@ func (c *Client) AsJson() ClientInterface {
 // which sets the HTTP content type as "application/xml" for the next request.
 //
 // Note that it also checks and encodes the parameter to XML format automatically.
-func (c *Client) AsXml() ClientInterface {
+func (c *Client) AsXml() *Client {
 	c.WithContentType(HttpHeaderContentTypeXml)
 	return c
 }
 
 // WithBasicAuth
 //Specify the basic authentication username and password for the request.
-func (c *Client) WithBasicAuth(username, password string) ClientInterface {
+func (c *Client) WithBasicAuth(username, password string) *Client {
 	c.WithToken(base64.StdEncoding.EncodeToString([]byte(username+":"+password)), AuthorizationTypeBasic)
 	return c
 }
 
 // WithToken
 //Specify an authorization token for the request.
-func (c *Client) WithToken(token string, authorizationType ...string) ClientInterface {
+func (c *Client) WithToken(token string, authorizationType ...string) *Client {
 	if len(authorizationType) > 0 {
 		token = authorizationType[0] + token
 	} else {

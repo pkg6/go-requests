@@ -18,7 +18,7 @@ func (c *Client) withContext(ctx context.Context) context.Context {
 	}
 	return ctx
 }
-func (c *Client) EnableTrace() ClientInterface {
+func (c *Client) EnableTrace() *Client {
 	c.trace = true
 	return c
 }
