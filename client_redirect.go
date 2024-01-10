@@ -99,7 +99,7 @@ func checkHostAndAddHeaders(request *http.Request, response *http.Request) {
 }
 
 // WithRedirectLimit limits the number of jumps.
-func (c *Client) WithRedirectLimit(redirectLimit int) ClientInterface {
+func (c *Client) WithRedirectLimit(redirectLimit int) *Client {
 	c.WithRedirectPolicy(func(req *http.Request, via []*http.Request) error {
 		if len(via) >= redirectLimit {
 			return http.ErrUseLastResponse
@@ -114,7 +114,7 @@ func (c *Client) WithRedirectLimit(redirectLimit int) ClientInterface {
 //	WithRedirectLimit(20)
 //	WithRedirectPolicy(FlexibleRedirectPolicy(20))
 //	WithRedirectPolicy(FlexibleRedirectPolicy(20), DomainCheckRedirectPolicy("host1.com", "host2.net"))
-func (c *Client) WithRedirectPolicy(policies ...any) ClientInterface {
+func (c *Client) WithRedirectPolicy(policies ...any) *Client {
 	if len(policies) == 1 {
 		if checkRedirect, ok := policies[0].(func(req *http.Request, via []*http.Request) error); ok {
 			c.SetCheckRedirect(checkRedirect)
