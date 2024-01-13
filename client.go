@@ -54,13 +54,17 @@ var (
 	defaultWaitTime    = time.Duration(2000) * time.Millisecond
 )
 
+type KVCallback func() (k, v string)
+
 type Client struct {
 	*http.Client
 	Debug bool
 
 	BaseUrl       string
 	Query         url.Values
+	QueryKVs      []KVCallback
 	Header        http.Header
+	HeaderKVs     []KVCallback
 	Cookie        Cookie
 	Logger        LoggerInterface
 	JSONMarshal   func(v any) ([]byte, error)
@@ -141,7 +145,9 @@ func (c *Client) Clone() *Client {
 	}
 	c.BaseUrl = ""
 	c.Query = make(url.Values, 0)
+	c.QueryKVs = []KVCallback{}
 	c.Header = make(http.Header, 0)
+	c.HeaderKVs = []KVCallback{}
 	c.Cookie = make(Cookie, 0)
 
 	if c.Logger == nil {
@@ -220,12 +226,20 @@ func (c *Client) SetQuery(query url.Values) *Client {
 	return c
 }
 
+func (c *Client) WithQueryKV(callback KVCallback) *Client {
+	c.QueryKVs = append(c.QueryKVs, callback)
+	return c
+}
 func (c *Client) SetCookie(cookie Cookie) *Client {
 	c.Cookie = cookie
 	return c
 }
 func (c *Client) SetHeader(header http.Header) *Client {
 	c.Header = header
+	return c
+}
+func (c *Client) WithHeaderKV(callback KVCallback) *Client {
+	c.HeaderKVs = append(c.HeaderKVs, callback)
 	return c
 }
 
