@@ -12,19 +12,24 @@ import (
 )
 
 func (c *Client) DoRequestUnmarshal(ctx context.Context, method string, uri string, data, d any) error {
-	response, err := c.DoRequest(ctx, method, uri, data)
+	_, err := c.DoRequestD(ctx, method, uri, data, d)
+	return err
+}
+func (c *Client) DoRequestD(ctx context.Context, method string, uri string, data, d any) (response *Response, err error) {
+	response, err = c.DoRequest(ctx, method, uri, data)
 	if err != nil {
-		return nil
+		return
 	}
 	defer func() {
 		_ = response.Close()
 	}()
 	if response.IsError() {
-		return &RequestError{StatusCode: response.StatusCode, Method: method, URI: uri, Response: response}
+		err = &RequestError{StatusCode: response.StatusCode, Method: method, URI: uri, Response: response}
+		return
 	}
-	return response.Unmarshal(d)
+	err = response.Unmarshal(d)
+	return
 }
-
 func (c *Client) DoRequestBytes(ctx context.Context, method string, uri string, data any) ([]byte, error) {
 	response, err := c.DoRequest(ctx, method, uri, data)
 	if err != nil {
