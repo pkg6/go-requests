@@ -192,9 +192,14 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 	if !strings.Contains(uri, HttpSchemeName) {
 		uri = HttpSchemeName + "://" + uri
 	}
-	if c.Query != nil {
-		uri = URIQuery(uri, c.Query).String()
+	q := []url.Values{c.Query}
+	kv := url.Values{}
+	for _, callback := range c.QueryKVs {
+		k, v := callback()
+		kv.Set(k, v)
 	}
+	q = append(q, kv)
+	uri = URIQuery(uri, q...).String()
 	params, err := c.prepareBody(method, body)
 	if err != nil {
 		return nil, err
@@ -245,6 +250,11 @@ func (c *Client) prepareRequest(ctx context.Context, method, uri string, body an
 	//Load cookies
 	if len(c.Cookie) > 0 {
 		c.Header.Set(HttpHeaderCookie, c.Cookie.Encode())
+	}
+	//kv callback
+	for _, callback := range c.HeaderKVs {
+		k, v := callback()
+		c.Header.Set(k, v)
 	}
 	// Custom header.
 	if len(c.Header) > 0 {
