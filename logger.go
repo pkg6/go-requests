@@ -6,24 +6,31 @@ import (
 )
 
 type Logger struct {
-	l *log.Logger
+	l    *log.Logger
+	logo string
+}
+
+func NewLogger(l *log.Logger, logo string) *Logger {
+	return &Logger{
+		l:    l,
+		logo: logo,
+	}
 }
 
 func DefaultLogger() *Logger {
-	l := &Logger{l: log.New(os.Stderr, "", log.Ldate|log.Lmicroseconds)}
-	return l
+	return NewLogger(log.New(os.Stderr, "", log.Ldate|log.Lmicroseconds), "GoRequests")
 }
 
 func (l *Logger) Errorf(format string, v ...interface{}) {
-	l.output("【ERROR】GOREQUEST "+format, v...)
+	l.output("【ERROR】"+l.logo+" "+format, v...)
 }
 
 func (l *Logger) Warnf(format string, v ...interface{}) {
-	l.output("【WARN】GOREQUEST "+format, v...)
+	l.output("【WARN】"+l.logo+" "+format, v...)
 }
 
 func (l *Logger) Debugf(format string, v ...interface{}) {
-	l.output("【DEBUG】GOREQUEST "+format, v...)
+	l.output("【DEBUG】"+l.logo+" "+format, v...)
 }
 
 func (l *Logger) output(format string, v ...interface{}) {
