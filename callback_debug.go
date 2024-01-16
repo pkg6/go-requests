@@ -13,7 +13,7 @@ const (
 	ctxDebugStartTime CtxKeyString = "_request_debug_logger_start_time"
 )
 
-func requestLogger(client *Client, request *http.Request) error {
+func onAfterRequestByDebug(client *Client, request *http.Request) error {
 	if client.Debug {
 		now := time.Now()
 		var body []byte
@@ -35,7 +35,7 @@ func requestLogger(client *Client, request *http.Request) error {
 	}
 	return nil
 }
-func responseLogger(client *Client, request *http.Request, response *Response) error {
+func onResponseByDebug(client *Client, request *http.Request, response *Response) error {
 	if client.Debug {
 		e := time.Now()
 		var responseBody []byte
@@ -61,7 +61,7 @@ func responseLogger(client *Client, request *http.Request, response *Response) e
 	return nil
 }
 
-func writerRequestResponseLog(client *Client, request *http.Request, response *Response) error {
+func onResponseByDebugWriter(client *Client, request *http.Request, response *Response) error {
 	if client.writer != nil {
 		var builder strings.Builder
 		builder.WriteString("REQUEST: \n")

@@ -187,9 +187,9 @@ func (c *Client) Clone() *Client {
 		c.WithUserAgent(defaultClientAgent)
 	}
 	c.writer = nil
-	c.OnAfterRequest(requestLogger)
-	c.OnResponse(responseLogger)
-	c.OnResponse(writerRequestResponseLog)
+	c.OnAfterRequest(onAfterRequestByDebug)
+	c.OnResponse(onResponseByDebug)
+	c.OnResponse(onResponseByDebugWriter)
 	c.attempt = 1
 	c.clone += 1
 	return c
