@@ -3,9 +3,7 @@ package requests
 import (
 	"context"
 	"crypto/tls"
-	"io"
 	"net/url"
-	"os"
 )
 
 //requests helper function
@@ -81,7 +79,13 @@ func Get(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	}
 	return client.Get(context.Background(), uri, data)
 }
-
+func GetD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.GetD(context.Background(), uri, data, d)
+}
 func GetUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
 	for _, arg := range args {
@@ -97,6 +101,13 @@ func Put(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	}
 	return client.Put(context.Background(), uri, data)
 }
+func PutD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.PutD(context.Background(), uri, data, d)
+}
 func PutUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
 	for _, arg := range args {
@@ -110,6 +121,13 @@ func Delete(uri string, data any, args ...ArgsFunc) (*Response, error) {
 		arg(client)
 	}
 	return client.Delete(context.Background(), uri, data)
+}
+func DeleteD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.DeleteD(context.Background(), uri, data, d)
 }
 func DeleteUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
@@ -125,6 +143,13 @@ func Head(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	}
 	return client.Head(context.Background(), uri, data)
 }
+func HeadD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.HeadD(context.Background(), uri, data, d)
+}
 func HeadUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
 	for _, arg := range args {
@@ -138,6 +163,13 @@ func Patch(uri string, data any, args ...ArgsFunc) (*Response, error) {
 		arg(client)
 	}
 	return client.Patch(context.Background(), uri, data)
+}
+func PatchD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.PatchD(context.Background(), uri, data, d)
 }
 func PatchUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
@@ -153,6 +185,13 @@ func Connect(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	}
 	return client.Connect(context.Background(), uri, data)
 }
+func ConnectD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.ConnectD(context.Background(), uri, data, d)
+}
 func ConnectUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
 	for _, arg := range args {
@@ -166,6 +205,13 @@ func Options(uri string, data any, args ...ArgsFunc) (*Response, error) {
 		arg(client)
 	}
 	return client.Options(context.Background(), uri, data)
+}
+func OptionsD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.OptionsD(context.Background(), uri, data, d)
 }
 func OptionsUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
@@ -181,6 +227,13 @@ func Trace(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	}
 	return client.Trace(context.Background(), uri, data)
 }
+func TraceD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.TraceD(context.Background(), uri, data, d)
+}
 func TraceUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
 	for _, arg := range args {
@@ -194,6 +247,13 @@ func Post(uri string, data any, args ...ArgsFunc) (*Response, error) {
 		arg(client)
 	}
 	return client.Post(context.Background(), uri, data)
+}
+func PostD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.PostD(context.Background(), uri, data, d)
 }
 func PostUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
@@ -209,6 +269,13 @@ func PostJson(uri string, data any, args ...ArgsFunc) (*Response, error) {
 	}
 	return client.PostJson(context.Background(), uri, data)
 }
+func PostJsonD(uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.PostJsonD(context.Background(), uri, data, d)
+}
 func PostJsonUnmarshal(uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
 	for _, arg := range args {
@@ -222,6 +289,13 @@ func PostForm(uri string, data url.Values, args ...ArgsFunc) (*Response, error) 
 		arg(client)
 	}
 	return client.PostForm(context.Background(), uri, data)
+}
+func PostFormD(uri string, data url.Values, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.PostFormD(context.Background(), uri, data, d)
 }
 func PostFormUnmarshal(uri string, data url.Values, d any, args ...ArgsFunc) error {
 	client := NewClient()
@@ -251,6 +325,13 @@ func Request(method, uri string, data any, args ...ArgsFunc) (*Response, error) 
 	}
 	return client.DoRequest(context.Background(), method, uri, data)
 }
+func RequestD(method, uri string, data, d any, args ...ArgsFunc) (*Response, error) {
+	client := NewClient()
+	for _, arg := range args {
+		arg(client)
+	}
+	return client.DoRequestD(context.Background(), method, uri, data, d)
+}
 
 func RequestUnmarshal(method, uri string, data, d any, args ...ArgsFunc) error {
 	client := NewClient()
@@ -258,38 +339,4 @@ func RequestUnmarshal(method, uri string, data, d any, args ...ArgsFunc) error {
 		arg(client)
 	}
 	return client.DoRequestUnmarshal(context.Background(), method, uri, data, d)
-}
-
-// RequestUnmarshalSaveFile
-//	var resp _testdata.GitHubUser
-//	err := requests.RequestUnmarshalSaveFile(http.MethodGet,
-//		"https://api.github.com/users/github",
-//		nil, &resp, "github_user.log")
-//	fmt.Println(err)
-//	fmt.Println(resp)
-func RequestUnmarshalSaveFile(method, uri string, data, d any, fileName string, args ...ArgsFunc) error {
-	client := NewClient()
-	for _, arg := range args {
-		arg(client)
-	}
-	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	client.SetWriter(file)
-	resp, err := client.DoRequest(context.Background(), method, uri, data)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = resp.Body.Close()
-	}()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if err = client.Unmarshal(resp.ContentType(), body, d); err != nil {
-		return err
-	}
-	return nil
 }
