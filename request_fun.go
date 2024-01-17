@@ -340,3 +340,7 @@ func RequestUnmarshal(method, uri string, data, d any, args ...ArgsFunc) error {
 	}
 	return client.DoRequestUnmarshal(context.Background(), method, uri, data, d)
 }
+
+func Download(uri, fileName string) error {
+	return NewClient().Download(context.Background(), uri, fileName)
+}
