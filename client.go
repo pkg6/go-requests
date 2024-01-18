@@ -28,12 +28,14 @@ const (
 	HttpHeaderCookie = `Cookie`
 
 	HttpHeaderUserAgent     = `User-Agent`
+	HttpHeaderAcceptRanges  = `Accept-Ranges`
 	HttpHeaderAuthorization = "Authorization"
 	HttpHeaderAccept        = "Accept"
 	HttpMIMEEventStream     = "text/event-stream"
 	HttpHeaderCacheControl  = "Cache-Control"
 	HttpHeaderConnection    = "Connection"
 	HttpHeaderContentType   = `Content-Type`
+	HttpHeaderContentLength = `Content-Length`
 
 	CharsetUTF8                          = "charset=UTF-8"
 	HttpHeaderContentTypeJson            = `application/json`
@@ -96,7 +98,7 @@ type Client struct {
 }
 
 // DefaultHttpClient
-//set InsecureSkipVerify = false c.Client.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify = false
+// set InsecureSkipVerify = false c.Client.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify = false
 func DefaultHttpClient(localAddr net.Addr) *http.Client {
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
@@ -137,7 +139,7 @@ func NewClient() *Client {
 }
 
 // Clone
-//Parameter initialization
+// Parameter initialization
 func (c *Client) Clone() *Client {
 	c.Debug = false
 	if c.Client == nil {
