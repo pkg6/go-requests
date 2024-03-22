@@ -304,20 +304,7 @@ func PostFormUnmarshal(uri string, data url.Values, d any, args ...ArgsFunc) err
 	}
 	return client.PostFormUnmarshal(context.Background(), uri, data, d)
 }
-func PostFormWithFiles(uri string, data url.Values, args ...ArgsFunc) (*Response, error) {
-	client := NewClient()
-	for _, arg := range args {
-		arg(client)
-	}
-	return client.PostFormWithFiles(context.Background(), uri, data)
-}
-func PostFormWithFilesUnmarshal(uri string, data url.Values, d any, args ...ArgsFunc) error {
-	client := NewClient()
-	for _, arg := range args {
-		arg(client)
-	}
-	return client.PostFormWithFilesUnmarshal(context.Background(), uri, data, d)
-}
+
 func Request(method, uri string, data any, args ...ArgsFunc) (*Response, error) {
 	client := NewClient()
 	for _, arg := range args {
