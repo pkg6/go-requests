@@ -1,14 +1,9 @@
 package requests
 
 import (
-	"bytes"
 	"context"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 )
 
 // Get send GET request and returns the response object.
@@ -86,61 +81,8 @@ func (c *Client) PostJson(ctx context.Context, uri string, data any) (*Response,
 // It's used for sending form data.
 // Note that the response object MUST be closed if it'll never be used.
 func (c *Client) PostForm(ctx context.Context, uri string, data url.Values) (*Response, error) {
-	body := new(bytes.Buffer)
-	w := multipart.NewWriter(body)
-	for k := range data {
-		v := data.Get(k)
-		if err := w.WriteField(k, v); err != nil {
-			return nil, err
-		}
-	}
-	if err := w.Close(); err != nil {
-		return nil, err
-	}
-	return c.WithContentType(w.FormDataContentType()).Post(ctx, uri, body)
-}
-
-// PostFormWithFiles is different from net/http.PostForm.
-// It's a wrapper of Post method, which sets the Content-Type as "multipart/form-data;".
-// and It will automatically set boundary characters for the request body and Content-Type.
-//
-// It's Seem like the following case:
-//
-// Content-Type: multipart/form-data; boundary=----Boundarye4Ghaog6giyQ9ncN
-//
-// And form data is like:
-// ------Boundarye4Ghaog6giyQ9ncN
-// Content-Disposition: form-data; name="checkType"
-//
-// none
-//
-// It's used for sending form data.
-// Note that the response object MUST be closed if it'll never be used.
-func (c *Client) PostFormWithFiles(ctx context.Context, uri string, data url.Values) (*Response, error) {
-	body := new(bytes.Buffer)
-	w := multipart.NewWriter(body)
-	for k := range data {
-		v := data.Get(k)
-		if strings.Contains(v, HttpParamFileHolder) {
-			localPathFile := strings.ReplaceAll(strings.ReplaceAll(v, HttpParamFileHolder, ""), " ", "")
-			osFile, err := os.Open(localPathFile)
-			if err != nil {
-				return nil, err
-			}
-			ioWriter, err := w.CreateFormFile(k, k)
-			if err != nil {
-				return nil, err
-			}
-			if _, err = io.Copy(ioWriter, osFile); err != nil {
-				return nil, err
-			}
-		} else {
-			if err := w.WriteField(k, v); err != nil {
-				return nil, err
-			}
-		}
-	}
-	if err := w.Close(); err != nil {
+	w, body, err := buildFormBody(data)
+	if err != nil {
 		return nil, err
 	}
 	return c.WithContentType(w.FormDataContentType()).Post(ctx, uri, body)
