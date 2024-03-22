@@ -186,24 +186,31 @@ func buildFormBody(data url.Values) (w *multipart.Writer, body *bytes.Buffer, er
 		v := data.Get(k)
 		if strings.Contains(v, HttpParamFileHolder) {
 			localPathFile := strings.TrimPrefix(v, HttpParamFileHolder)
-			osFile, err := os.Open(localPathFile)
+			var (
+				osFile   *os.File
+				ioWriter io.Writer
+			)
+			osFile, err = os.Open(localPathFile)
 			if err != nil {
 				return
 			}
-			ioWriter, err := w.CreateFormFile(k, k)
+			ioWriter, err = w.CreateFormFile(k, k)
 			if err != nil {
 				return
 			}
-			if _, err = io.Copy(ioWriter, osFile); err != nil {
+			_, err = io.Copy(ioWriter, osFile)
+			if err != nil {
 				return
 			}
 		} else {
-			if err := w.WriteField(k, v); err != nil {
+			err = w.WriteField(k, v)
+			if err != nil {
 				return
 			}
 		}
 	}
-	if err := w.Close(); err != nil {
+	err = w.Close()
+	if err != nil {
 		return
 	}
 	return
