@@ -46,7 +46,7 @@ func main() {
 u := url.Values{}
 u.Set("服务端接受的name名称", "@file:loaclfile.txt")
 request := requests.New()
-request.PostFormWithFiles(context.Background(), "http://127.0.0.1/upload", u)
+request.PostForm(context.Background(), "http://127.0.0.1/upload", u)
 ~~~
 
 ## stream请求与返回处理

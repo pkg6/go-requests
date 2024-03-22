@@ -1,14 +1,9 @@
 package requests
 
 import (
-	"bytes"
 	"context"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 )
 
 func (c *Client) GetUnmarshal(ctx context.Context, uri string, data, d any) error {
@@ -42,44 +37,8 @@ func (c *Client) PostJsonUnmarshal(ctx context.Context, uri string, data, d any)
 	return c.AsJson().DoRequestUnmarshal(ctx, http.MethodPost, uri, data, d)
 }
 func (c *Client) PostFormUnmarshal(ctx context.Context, uri string, data url.Values, d any) error {
-	body := new(bytes.Buffer)
-	w := multipart.NewWriter(body)
-	for k := range data {
-		v := data.Get(k)
-		if err := w.WriteField(k, v); err != nil {
-			return err
-		}
-	}
-	if err := w.Close(); err != nil {
-		return err
-	}
-	return c.WithContentType(w.FormDataContentType()).PostUnmarshal(ctx, uri, body, d)
-}
-func (c *Client) PostFormWithFilesUnmarshal(ctx context.Context, uri string, data url.Values, d any) error {
-	body := new(bytes.Buffer)
-	w := multipart.NewWriter(body)
-	for k := range data {
-		v := data.Get(k)
-		if strings.Contains(v, HttpParamFileHolder) {
-			localPathFile := strings.ReplaceAll(strings.ReplaceAll(v, HttpParamFileHolder, ""), " ", "")
-			osFile, err := os.Open(localPathFile)
-			if err != nil {
-				return err
-			}
-			ioWriter, err := w.CreateFormFile(k, k)
-			if err != nil {
-				return err
-			}
-			if _, err = io.Copy(ioWriter, osFile); err != nil {
-				return err
-			}
-		} else {
-			if err := w.WriteField(k, v); err != nil {
-				return err
-			}
-		}
-	}
-	if err := w.Close(); err != nil {
+	w, body, err := buildFormBody(data)
+	if err != nil {
 		return err
 	}
 	return c.WithContentType(w.FormDataContentType()).PostUnmarshal(ctx, uri, body, d)
