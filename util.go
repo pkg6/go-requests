@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/url"
+	"os"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -174,4 +177,34 @@ func buildQuery(buf *bytes.Buffer, key string, val any) {
 	default:
 		buf.WriteString(url.QueryEscape(fmt.Sprint(v)))
 	}
+}
+
+func buildFormBody(data url.Values) (w *multipart.Writer, body *bytes.Buffer, err error) {
+	body = new(bytes.Buffer)
+	w = multipart.NewWriter(body)
+	for k := range data {
+		v := data.Get(k)
+		if strings.Contains(v, HttpParamFileHolder) {
+			localPathFile := strings.TrimPrefix(v, HttpParamFileHolder)
+			osFile, err := os.Open(localPathFile)
+			if err != nil {
+				return
+			}
+			ioWriter, err := w.CreateFormFile(k, k)
+			if err != nil {
+				return
+			}
+			if _, err = io.Copy(ioWriter, osFile); err != nil {
+				return
+			}
+		} else {
+			if err := w.WriteField(k, v); err != nil {
+				return
+			}
+		}
+	}
+	if err := w.Close(); err != nil {
+		return
+	}
+	return
 }

@@ -1,14 +1,9 @@
 package requests
 
 import (
-	"bytes"
 	"context"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 )
 
 func (c *Client) GetD(ctx context.Context, uri string, data, d any) (response *Response, err error) {
@@ -42,44 +37,8 @@ func (c *Client) PostJsonD(ctx context.Context, uri string, data, d any) (respon
 	return c.AsJson().DoRequestD(ctx, http.MethodPost, uri, data, d)
 }
 func (c *Client) PostFormD(ctx context.Context, uri string, data url.Values, d any) (response *Response, err error) {
-	body := new(bytes.Buffer)
-	w := multipart.NewWriter(body)
-	for k := range data {
-		v := data.Get(k)
-		if err := w.WriteField(k, v); err != nil {
-			return nil, err
-		}
-	}
-	if err := w.Close(); err != nil {
-		return nil, err
-	}
-	return c.WithContentType(w.FormDataContentType()).PostD(ctx, uri, body, d)
-}
-func (c *Client) PostFormWithFilesD(ctx context.Context, uri string, data url.Values, d any) (response *Response, err error) {
-	body := new(bytes.Buffer)
-	w := multipart.NewWriter(body)
-	for k := range data {
-		v := data.Get(k)
-		if strings.Contains(v, HttpParamFileHolder) {
-			localPathFile := strings.ReplaceAll(strings.ReplaceAll(v, HttpParamFileHolder, ""), " ", "")
-			osFile, err := os.Open(localPathFile)
-			if err != nil {
-				return nil, err
-			}
-			ioWriter, err := w.CreateFormFile(k, k)
-			if err != nil {
-				return nil, err
-			}
-			if _, err = io.Copy(ioWriter, osFile); err != nil {
-				return nil, err
-			}
-		} else {
-			if err := w.WriteField(k, v); err != nil {
-				return nil, err
-			}
-		}
-	}
-	if err := w.Close(); err != nil {
+	w, body, err := buildFormBody(data)
+	if err != nil {
 		return nil, err
 	}
 	return c.WithContentType(w.FormDataContentType()).PostD(ctx, uri, body, d)
